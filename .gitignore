@@ -23,6 +23,7 @@ IARS/x64/
 IARS/lib/*
 IARS/include/*
 !IARS/include/*.7z
+!IARS/include/protomsg.7z
 
 # GitHub 拒绝超过 100MB 的普通文件
 盐田东港OCR/42台OCRIP地址.xlsx
