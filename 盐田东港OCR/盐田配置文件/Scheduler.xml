@@ -1,0 +1,68 @@
+<root version="v2.1">
+	<!--
+		1、 闸口管理系统 ?	GOS		Gate operation system
+		2、 进场主闸 ?		ITMG	Inbound terminal main gate
+		3、 进场控制闸 		ITAG? 	Inbound terminal access gate
+		4、 进场OCR闸 		IODCZ? 	Inbound OCR Data collection zone
+		5、 出场主闸		OTMG ??	Outbound terminal main gate
+		6、 出场控制闸		OTEG? 	Outbound terminal exit gate
+		7、 出场OCR闸 		OODCZ? 	Outbound OCR Data collection zone
+	-->
+	<!-- 模块配置 
+		pubport为0时不发布数据 
+		module_type/gate_name 闸口名称：OTTG/ITMG/OODCZ...
+		module_name/lane_name 车道名称：OTTG01/ITMG06/OODCZ11...
+		heart_sec 发送心跳消息时间间隔
+		debug 为1时显示调试信息
+		log_size 日志计数，用于批量存储，0不存储
+		stateinfo_interval 发送StateInfo消息时间间隔
+		dev_type 设备类型，3表示工控机，4表示一体机
+		dev_name 设备名称
+		laserViewEnable="是否开启激光可视化框，如果开启需要激光模块可视化的配合才能观察"
+	-->
+	<Main module_type="OUT" module_name="OUT03" lane_name="OUT03" gate_name="OUT" ipaddr="10.184.51.65" pubport="5551" heart_sec="30" debug="1" log_size="200" stateinfo_interval="600" dev_type="3" dev_name="识别主机" laserViewEnable="0" crs_title="C:\Windows\system32\cmd.exe">
+		<!-- 配置主程序是否发布数据，用于进程间通信 UnPubMsg（黑名单）和PubMsg（白名单）如果都配置则以UnPubMsg为主  -->
+		<UnPubMsg enable="0">
+			<item msg_url="ocrs.pb.MsgInfo" description="心跳信息等" 	enable="0"/>
+			<item msg_url="*" 				description="所有proto消息"	enable="0"/>
+			<item msg_url="ocrs.pb.RTask" 	description="识别任务" 		enable="0"/>
+		</UnPubMsg>
+		<PubMsg enable="1">
+			<item msg_url="ocrs.pb.MsgInfo" description="心跳信息等" 	enable="0"/>
+			<item msg_url="*" 				description="所有proto消息"	enable="0"/>
+			<item msg_url="trans.pb.StitchFrame" 		description="拼接任务帧" 		enable="0"/>
+			<item msg_url="gate.pb.TruckTrigger" 		description="TruckTrigger" 		enable="0"/>
+			<item msg_url="ocrs.pb.GRpc_RImage" 		description="GRpc_RImage" 		enable="0"/>
+			<item msg_url="ocrs.pb.GRpc_RepeadResult" 	description="GRpc_RepeadResult" 		enable="0"/>
+			<item msg_url="gate.pb.TruckState" 	description="TruckState" 		enable="0"/>
+			<item msg_url="gate.pb.GateImage" 	description="GateImage" 		enable="0"/>
+			<item msg_url="trans.pb.StitchVideo" 	description="图像拼接视频路径" 		enable="1"/>
+			
+		</PubMsg>
+	</Main>
+	<!-- ZMQ 订阅配置 -->
+	<SubCfg>
+		<item type="STITCH" 	name="STITCH" 	ipaddr="192.168.40.105" 		port="5557" enable="0"/>
+		<item type="STITCH" 	name="STITCH" 	ipaddr="192.168.40.171" 		port="5557" enable="0"/>
+		<item type="PickCard" 	name="PickCard" ipaddr="127.0.0.1" 		port="5050" enable="0"/>
+		<item type="OTTGx" 		name="OTTGx" 	ipaddr="10.158.12.173" 	port="5050" enable="0"/>
+	</SubCfg>
+    <!-- 调用模块配置 -->
+	<ModuleCfg>
+		<!-- 通信模块 -->
+		<item type="DataCommDLL"	name="DataCommDLL" 		cfg="./DataCommDLL.xml" 			path="./DataCommDLL.dll" 			enable="0"/>
+		<item type="TruckPlateDLL"	name="TruckPlateDLL" 	cfg="./TruckPlateDLL.xml" 			path="./TruckPlateDLL.dll" 			enable="0"/>
+        <item type="TruckDetectDLL"	name="TruckDetectDLL" 	cfg=".\TruckDetectDLL.xml" 			path=".\TruckDetectDLL.dll" 		enable="1"/>
+		<item type="PBSTOREDDLL"	name="PBSTOREDLL" 		cfg="./PBStoreDLL.xml" 				path="./PBSTOREDLL.dll" 			enable="0"/>
+		<item type="RCSDLL"			name="RCSDLL" 			cfg="./RCSConfig.xml" 				path="./RCSDLL.dll" 				enable="0"/> 
+		<item type="BusinessDLL"	name="BusinessDLL" 		cfg="./BusinessDLL.xml" 			path="./BusinessDLL.dll" 			enable="0"/> 
+		<item type="ETCDLL"			name="ETCDLL" 			cfg="./ETCDLL.xml" 					path="./ETCDLL.dll" 				enable="0"/> 
+		<item type="RFIDDLL"		name="RFIDDLL" 			cfg="./RFIDDLL.xml" 				path="./RFIDDLL.dll" 				enable="0"/>
+		<item type="WeighBridgeDLL"	name="WeighBridgeDLL" 	cfg="./WeighBridgeDLL.xml" 			path="./WeighBridgeDLL.dll" 		enable="0"/>
+		<item type="IDCardDLL"		name="IDCardDLL" 		cfg="" 								path="./IDCardDLL.dll" 				enable="0"/>
+		<item type="ICTMSDLL"		name="ICTMSDLL" 		cfg="./ICTMSDLL.xml" 				path="./ICTMSDLL.dll" 				enable="0"/>
+		<item type="PLCSwitchDLL"	name="PLCSwitchDLL" 	cfg="./PLCSwitchDLL.xml" 			path="./PLCSwitchDLL.dll" 			enable="0"/>
+		<item type="PeripCtrlDLL"	name="PeripCtrlDLL" 	cfg="./PeripheralControlDLL.xml" 	path="./PeripheralControlDLL.dll" 	enable="0"/>
+		<!-- <item type="ContainerTempDLL"	name="ContainerTempDLL" 	cfg="./ContainerTempDLL.xml" 	path="./ContainerTempDLL.dll" 	enable="0"/> -->
+	</ModuleCfg>
+</root>

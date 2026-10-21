@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{05115B17-015F-4390-95A7-EF34CBD4BCE8}</ProjectGuid>
+    <RootNamespace>IARS</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\x64\Release</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../include/protomsg;$(ProjectDir)../include/protomsg/grpc/include;$(ProjectDir)../include/protomsg/grpc/include/address_sorting</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;PROTOBUF_USE_DLLS;_WIN32_WINNT=0x600;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(ProjectDir)../lib/debug;$(ProjectDir)../include/protomsg/grpc/lib/debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>grpc.lib;grpc++.lib;grpc++_alts.lib;grpc++_error_details.lib;grpc_unsecure.lib;grpc++_unsecure.lib;libprotocd.lib;libprotobufd.lib;gpr.lib;absl_base.lib;absl_exponential_biased.lib;absl_log_severity.lib;absl_malloc_internal.lib;absl_periodic_sampler.lib;absl_raw_logging_internal.lib;absl_scoped_set_env.lib;absl_spinlock_wait.lib;absl_throw_delegate.lib;absl_hashtablez_sampler.lib;absl_raw_hash_set.lib;absl_flags.lib;absl_flags_config.lib;absl_flags_internal.lib;absl_flags_marshalling.lib;absl_flags_program_name.lib;absl_flags_parse.lib;absl_flags_usage.lib;absl_flags_usage_internal.lib;absl_city.lib;absl_hash.lib;absl_int128.lib;absl_random_distributions.lib;absl_random_internal_distribution_test_util.lib;absl_random_internal_pool_urbg.lib;absl_random_internal_randen.lib;absl_random_internal_randen_hwaes.lib;absl_random_internal_randen_hwaes_impl.lib;absl_random_internal_randen_slow.lib;absl_random_internal_seed_material.lib;absl_random_seed_gen_exception.lib;absl_random_seed_sequences.lib;absl_str_format_internal.lib;absl_strings.lib;absl_strings_internal.lib;absl_graphcycles_internal.lib;absl_synchronization.lib;absl_civil_time.lib;absl_time.lib;absl_time_zone.lib;absl_bad_any_cast_impl.lib;absl_bad_optional_access.lib;absl_bad_variant_access.lib;absl_symbolize.lib;absl_stacktrace.lib;absl_status.lib;absl_statusor.lib;absl_cord.lib;upb.lib;re2.lib;cares_static.lib;zlibstatic.lib;crypto.lib;ssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)../include/protomsg/grpc/include/address_sorting;$(ProjectDir)../include/protomsg/grpc/include;$(ProjectDir)../include/protomsg/;$(ProjectDir)../include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;PROTOBUF_USE_DLLS;_CONSOLE;_WIN32_WINNT=0x600;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(ProjectDir)../include/protomsg/grpc/lib/release;$(ProjectDir)../lib/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>grpc.lib;grpc++.lib;grpc++_alts.lib;grpc++_error_details.lib;grpc_unsecure.lib;grpc++_unsecure.lib;libprotoc.lib;libprotobuf.lib;gpr.lib;absl_base.lib;absl_exponential_biased.lib;absl_log_severity.lib;absl_malloc_internal.lib;absl_periodic_sampler.lib;absl_raw_logging_internal.lib;absl_scoped_set_env.lib;absl_spinlock_wait.lib;absl_throw_delegate.lib;absl_hashtablez_sampler.lib;absl_raw_hash_set.lib;absl_flags.lib;absl_flags_config.lib;absl_flags_internal.lib;absl_flags_marshalling.lib;absl_flags_program_name.lib;absl_flags_parse.lib;absl_flags_usage.lib;absl_flags_usage_internal.lib;absl_city.lib;absl_hash.lib;absl_int128.lib;absl_random_distributions.lib;absl_random_internal_distribution_test_util.lib;absl_random_internal_pool_urbg.lib;absl_random_internal_randen.lib;absl_random_internal_randen_hwaes.lib;absl_random_internal_randen_hwaes_impl.lib;absl_random_internal_randen_slow.lib;absl_random_internal_seed_material.lib;absl_random_seed_gen_exception.lib;absl_random_seed_sequences.lib;absl_str_format_internal.lib;absl_strings.lib;absl_strings_internal.lib;absl_graphcycles_internal.lib;absl_synchronization.lib;absl_civil_time.lib;absl_time.lib;absl_time_zone.lib;absl_bad_any_cast_impl.lib;absl_bad_optional_access.lib;absl_bad_variant_access.lib;absl_symbolize.lib;absl_stacktrace.lib;absl_status.lib;absl_statusor.lib;absl_cord.lib;upb.lib;re2.lib;cares_static.lib;zlibstatic.lib;crypto.lib;ssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\include\protomsg\gui.pb.cc" />
+    <ClCompile Include="..\include\protomsg\iars.pb.cc" />
+    <ClCompile Include="..\include\protomsg\ocrs_Grpc.grpc.pb.cc" />
+    <ClCompile Include="..\include\protomsg\ocrs_Grpc.pb.cc" />
+    <ClCompile Include="address_sorting.c" />
+    <ClCompile Include="address_sorting_posix.c" />
+    <ClCompile Include="address_sorting_windows.c" />
+    <ClCompile Include="AppConfig.cpp" />
+    <ClCompile Include="CameraConfig.cpp" />
+    <ClCompile Include="CDataIntegration.cpp" />
+    <ClCompile Include="CDHCam.cpp" />
+    <ClCompile Include="CGRPCRequest.cpp" />
+    <ClCompile Include="cJSON.c" />
+    <ClCompile Include="ComposeResult.cpp" />
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="CrashDetect.cpp" />
+    <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="Devices.cpp" />
+    <ClCompile Include="EnumTransform.cpp" />
+    <ClCompile Include="FtpClient.cpp" />
+    <ClCompile Include="HKGun.cpp" />
+    <ClCompile Include="ICEGun.cpp" />
+    <ClCompile Include="IPCamera.cpp" />
+    <ClCompile Include="IRASmain.cpp" />
+    <ClCompile Include="Monitor.cpp" />
+    <ClCompile Include="PicSave.cpp" />
+    <ClCompile Include="PLCHttpComm.cpp" />
+    <ClCompile Include="PLCInfo.cpp" />
+    <ClCompile Include="PLCInfoState.cpp" />
+    <ClCompile Include="RecordPLCData.cpp" />
+    <ClCompile Include="RemoteControl.cpp" />
+    <ClCompile Include="TaskManager.cpp" />
+    <ClCompile Include="tokenizer.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="ZmqComm.cpp" />
+    <ClCompile Include="ZMQManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\protomsg\gui.pb.h" />
+    <ClInclude Include="..\include\protomsg\iars.pb.h" />
+    <ClInclude Include="..\include\protomsg\ocrs_Grpc.grpc.pb.h" />
+    <ClInclude Include="..\include\protomsg\ocrs_Grpc.pb.h" />
+    <ClInclude Include="address_sorting.h" />
+    <ClInclude Include="address_sorting_internal.h" />
+    <ClInclude Include="AppConfig.h" />
+    <ClInclude Include="CameraConfig.h" />
+    <ClInclude Include="CDataIntegration.h" />
+    <ClInclude Include="CDHCam.h" />
+    <ClInclude Include="CGRPCRequest.h" />
+    <ClInclude Include="cJSON.h" />
+    <ClInclude Include="ComposeResult.h" />
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="CrashDetect.h" />
+    <ClInclude Include="csv.hpp" />
+    <ClInclude Include="debug.h" />
+    <ClInclude Include="DeviceManager.h" />
+    <ClInclude Include="Devices.h" />
+    <ClInclude Include="EnumTransform.h" />
+    <ClInclude Include="FtpClient.h" />
+    <ClInclude Include="HKGun.h" />
+    <ClInclude Include="httplib.h" />
+    <ClInclude Include="ICEGun.h" />
+    <ClInclude Include="IPCamera.h" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="md5.hpp" />
+    <ClInclude Include="Monitor.h" />
+    <ClInclude Include="MySyncQueue.h" />
+    <ClInclude Include="ocrs.pb.h" />
+    <ClInclude Include="PicSave.h" />
+    <ClInclude Include="PLCHttpComm.h" />
+    <ClInclude Include="PLCInfo.h" />
+    <ClInclude Include="PLCInfoState.h" />
+    <ClInclude Include="RecordPLCData.h" />
+    <ClInclude Include="RemoteControl.h" />
+    <ClInclude Include="SubManager.h" />
+    <ClInclude Include="SyncQueue.h" />
+    <ClInclude Include="TaskManager.h" />
+    <ClInclude Include="ThreadQue.hpp" />
+    <ClInclude Include="TimeMeter.hpp" />
+    <ClInclude Include="tokenizer.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="ZmqComm.h" />
+    <ClInclude Include="ZMQManager.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

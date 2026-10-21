@@ -1,0 +1,108 @@
+<GalaxyVism version="v2.1">
+	<!--
+		debug="是否调试，1为调试，0为不调试" 
+		subName="订阅信息名称" 
+		heavyCarTimeOut="重车，复合期间任务结束超时等待时间"
+		emptyCarTimeOut="空车，复合期间任务结束超时等待时间"
+		saveResult="是否保存复合结果为pb文件，0:不保存,保存"
+		savePath="debug日志输出的地址，也包括保存的复合结果的存储位置"
+		TemperatureDetect="是否开启温度检测功能"
+		free_space="磁盘剩余空间百分比 小于0~100"
+		rfid_wait_time="开始复合时，如果没有rfid数据等待的时间 毫秒"
+	-->
+	<User debug="1" deviceName="RCS" saveResult="0" savePath="D:\Cathay\Data\" heavyCarTimeOut="50" emptyCarTimeOut="20" useCopilot="0" TemperatureDetect="0" free_space="15" temperature_detect="0" truck_weight="3000" valid_height_rate="0.6" valid_conf="0.8" img_quality="30"/>
+	<Compose compose_type="1"  recv_truck_out_delay="0" recv_plate_delay="0" recv_weight_delay="0" rfid_wait_time="10000" />
+	<!-- LeftSaveCount="上传左侧几张照片" RightSaveCount="上传右侧几张照片" TopSaveCount="上传上侧几张照片" TailSaveCount="上传尾部几张照片" -->
+	<TaskSetting LeftSaveCount="2" RightSaveCount="2"/>
+	<!-- 安装参数 PlateCameraCount="车牌相机安装个数" -->
+	<InstallParam PlateCameraCount="2" />
+	<!-- 箱号大小 -->
+	<CnSize>
+		<!-- 20尺的箱子的ISO号都有哪些,放些常用的ISO码 -->
+		<CN20FT>
+			<!-- 可添加 -->
+			<item>22G1</item>	<!-- 干货箱 -->
+			<item>25G1</item>	<!-- 干货高箱 -->
+			<item>22V1</item>	<!-- 挂衣箱 -->
+			<item>22U1</item>	<!-- 开顶箱 -->
+			<item>22R1</item>	<!-- 冷冻箱 -->
+			<item>25R1</item>	<!-- 冷高箱 -->
+			<item>22T1</item>	<!-- 油罐箱 -->
+			<item>22P1</item>	<!-- 框架箱 -->
+			<item>22K2</item>	<!-- 罐式集装箱 -->
+			<item>22K8</item>
+			<item>22T6</item>
+			<item>22T7</item>
+			<item>22T8</item>
+			<item>20K2</item>
+		</CN20FT>
+		<!-- 40尺的箱子的ISO号都有哪些,放些常用的ISO码 -->
+		<CN40FT>
+			<!-- 可添加 -->
+			<item>42G1</item>	<!-- 干货箱 -->
+			<item>45G1</item>	<!-- 干货高箱 -->
+			<item>42V1</item>	<!-- 挂衣箱 -->
+			<item>42U1</item>	<!-- 开顶箱 -->
+			<item>42R1</item>	<!-- 冷冻箱 -->
+			<item>45R1</item>	<!-- 冷高箱 -->
+			<item>42T1</item>	<!-- 油罐箱 -->
+			<item>42P1</item>	<!-- 框架箱 -->
+			<item>45U6</item>
+			<item>45G0</item>
+		</CN40FT>
+		<!-- 45尺的箱子的ISO号都有哪些,放些常用的ISO码 -->
+		<CN45FT>
+			<!-- 可添加 -->
+			<item>L2G1</item>   <!-- 干货箱 -->
+			<item>L5G1</item>   <!-- 干货高箱 -->
+			<item>L2V1</item>   <!-- 挂衣箱 -->
+			<item>L2U1</item>   <!-- 开顶箱 -->
+			<item>L2R1</item>   <!-- 冷冻箱 -->
+			<item>L5R1</item>   <!-- 冷高箱 -->
+			<item>L2T1</item>   <!-- 油罐箱 -->
+			<item>L2P1</item>   <!-- 框架箱 -->
+		</CN45FT>
+	</CnSize>
+	
+	<!-- 箱号识别结果拍摄位置 -->
+	<CNRS>
+		<!-- 前门相机 -->
+		<FRONT_CAMERAS>
+			<item>Front</item>			
+		</FRONT_CAMERAS>
+		<!-- 后门相机 -->
+		<BACK_CAMERAS>
+			<item>Tail</item>
+		</BACK_CAMERAS>
+		<!-- 左侧相机 -->
+		<LEFT_CAMERAS>
+			<item>LEFT</item>
+		</LEFT_CAMERAS>
+		<!-- 右侧相机 -->
+		<RIGHT_CAMERAS>
+			<item>RIGHT</item>
+		</RIGHT_CAMERAS>
+	</CNRS>
+	<!-- 从采集模块获取的图片，从下面的item中的字段，如果有这个方向的图片，都会进行上传（适用于线阵激光，四五期的话，不用配置）
+		 举例：QQCTN需要上传顶部的长图，但是这个长图不需要获取识别的内容，只需要上传图片即可，下面配置上这个长图的识别方向名字即可
+	-->
+	<UPLOADIMG>
+		<item>OODCZ02_LEFT</item>
+		<item>OODCZ02_MID</item>
+		<item>OODCZ02_RIGHT</item>
+		<item>BeamFront_DOOR</item>	<!-- 前侧照片 -->
+		<item>BeamTail_DOOR</item>	<!-- 后侧照片 -->
+	</UPLOADIMG>
+	
+	<!-- 港内车牌映射 confidence="如果车牌的置信度小于这个值的话，就进行港内车牌映射" cfgLocation="车牌映射的表的位置" -->
+	<PLATEMAPPING mappingSuccessConfidence="95" cfgLocation="D:/plateMapping.txt" enable="0"/>
+	<!-- 暂时不用,保留 -->
+	<CDRS>
+		 <FRONT_CAMERAS>
+			<item>BeamFront_DOOR</item>
+		</FRONT_CAMERAS>
+		<BACK_CAMERAS>
+			<item>BeamTail_DOOR</item>
+		</BACK_CAMERAS>
+	</CDRS>
+</GalaxyVism>

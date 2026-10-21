@@ -1,0 +1,22 @@
+<GalaxyVism version="v1.1">
+	<!-- 
+		debug        ="调试模式 0：不使能 1：使能"
+		device_name  ="设备名称,暂时无用"
+		device_comm  ="通信地址,0xFF"
+		device_power ="设备功率,单位：dbm"
+		delay_time   ="延时时间,单位:ms"
+	-->
+    <User debug="0" device_name="GZY-612" device_comm="FF" device_power ="30" delay_time="200"/>
+	<!--
+		lanetype ="通道类型"
+		lanename ="车道名称"
+		ip       ="RFID设备ip"
+		port     ="RFID设备端口号"
+		enable   ="是否启用当前RFID，1：启用，0：不启用"
+	-->
+	<DEV>
+		<item lanetype="OUT"	lanename="OUT03"	  ip="192.168.18.41" 	port="6000" enable="1"/>
+	</DEV>
+</GalaxyVism>
+
+

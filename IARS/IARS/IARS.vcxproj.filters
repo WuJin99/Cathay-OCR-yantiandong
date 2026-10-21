@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="proto">
+      <UniqueIdentifier>{ca76a977-3b0c-4b17-9472-bd0736952123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\grpc3rd">
+      <UniqueIdentifier>{91ad3c0e-38dd-4917-a558-1e704c8ec8f3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AppConfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraConfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Devices.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HKGun.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="IRASmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PLCInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RecordPLCData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tokenizer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZmqComm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CGRPCRequest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CDataIntegration.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ComposeResult.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PicSave.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EnumTransform.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="IPCamera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZMQManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PLCInfoState.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Monitor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\protomsg\gui.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\protomsg\iars.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\protomsg\ocrs_Grpc.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\protomsg\ocrs_Grpc.grpc.pb.cc">
+      <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="address_sorting.c">
+      <Filter>头文件\grpc3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="address_sorting_posix.c">
+      <Filter>头文件\grpc3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="address_sorting_windows.c">
+      <Filter>头文件\grpc3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashDetect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ICEGun.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PLCHttpComm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CDHCam.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cJSON.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AppConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="csv.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Devices.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HKGun.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PLCInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RecordPLCData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SubManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeMeter.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tokenizer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZmqComm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CGRPCRequest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CDataIntegration.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ComposeResult.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PicSave.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumTransform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="IPCamera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZMQManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PLCInfoState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MySyncQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Monitor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\protomsg\gui.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\protomsg\iars.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\protomsg\ocrs_Grpc.grpc.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\protomsg\ocrs_Grpc.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="ocrs.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
+    <ClInclude Include="address_sorting.h">
+      <Filter>头文件\grpc3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="address_sorting_internal.h">
+      <Filter>头文件\grpc3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="FtpClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashDetect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadQue.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ICEGun.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="httplib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PLCHttpComm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CDHCam.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cJSON.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

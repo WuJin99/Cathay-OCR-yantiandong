@@ -1,0 +1,24 @@
+<GalaxyVism version="v2.1">
+	
+	<SaveMsgUrl enable="1">
+	<item msg_url="*" 			description="所有" 		enable="1"/>
+	<item msg_url="gate.pb.TruckTrigger" 			description="来车检测" 		enable="1"/>
+	<item msg_url="gate.pb.TruckPassGate" 			description="集装箱状态信息" 	enable="1"/>	
+	<item msg_url="ocrs.pb.GRpc_RImage" 			description="照片信息" 		enable="1"/>
+	<item msg_url="ocrs.pb.GRpc_RepeadResult" 		description="识别结果" 		enable="1"/>	
+	<item msg_url="gate.pb.TruckPlateResult" 		description="车牌结果" 		enable="1"/>
+	<item msg_url="gate.pb.SegmentResult" 		description="分割结果" 		enable="1"/>
+	
+	<item msg_url="gate.pb.TruckRFIDResult" 		description="RFID结果" 		enable="1"/>
+	<item msg_url="gate.pb.TruckETCResult" 			description="ETC结果" 		enable="1"/>
+	<item msg_url="gate.pb.TruckWeightResult" 		description="重量信息结果" 	enable="0"/>
+	<item msg_url="gate.pb.TruckCopilotResult" 		description="副驾驶结果" 		enable="1"/>
+	<item msg_url="gate.pb.ResidentIdCard" 			description="身份证结果" 		enable="1"/>	
+	<item msg_url="gate.pb.ContainerData" 			description="集装箱结果" 		enable="1"/>
+	<item msg_url="gate.pb.TruckData" 				description="集卡车结果" 		enable="1"/>
+	<item msg_url="gate.pb.CtrlToGate" 				description="采集信息结果" 	enable="1"/>	
+	<item msg_url="gate.pb.GatherData" 				description="采集信息结果" 	enable="1"/>	
+	<item msg_url="gate.pb.PrintData" 				description="打印结果" 		enable="1"/>	
+	<item msg_url="gate.pb.InCheckToGate" 			description="进闸正常收箱 与待检" 	enable="1"/>
+	</SaveMsgUrl>
+</GalaxyVism>

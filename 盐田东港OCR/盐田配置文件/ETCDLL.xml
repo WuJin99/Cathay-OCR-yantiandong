@@ -1,0 +1,20 @@
+<GalaxyVism version="v1.1">
+	<!-- 
+		debug        ="调试模式 0：不使能 1：使能"
+		device_name  ="设备名称，暂时无用"
+		delay_time   ="延时时间,单位:ms"
+	-->
+    <User debug="0" device_name="" delay_time="1000"/>
+	<!--
+		lanetype ="通道类型"
+		lanename ="车道名称"
+		ip       ="ETC设备ip"
+		port     ="ETC设备端口号"
+		enable   ="是否启用当前ETC，1：启用，0：不启用"
+	-->
+	<DEV>
+		<item lanetype="IN"	lanename="IN07"	  ip="192.168.18.40" 	port="8899" enable="1"/>
+	</DEV>
+</GalaxyVism>
+
+

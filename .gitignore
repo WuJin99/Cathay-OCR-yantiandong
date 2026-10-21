@@ -1,0 +1,28 @@
+# SVN 元数据
+.svn/
+
+# 编辑器 / IDE 本机状态
+.vscode/
+.agents/
+.vs/
+*.suo
+*.user
+*.vcxproj.user
+~$*
+
+# 现场问题资料，与工程编译无关
+盐田东港场桥问题汇总/
+
+# IARS 中间目录与输出目录
+# 含 obj、tlog、exe、pdb，以及运行时 DLL、配置和日志
+IARS/IARS/x64/
+IARS/x64/
+
+# 依赖压缩包。散文件留在本机，仓库只保留压缩包
+# lib.zip 在 IARS/ 下，不在 lib/ 目录里
+IARS/lib/*
+IARS/include/*
+!IARS/include/*.7z
+
+# GitHub 拒绝超过 100MB 的普通文件
+盐田东港OCR/42台OCRIP地址.xlsx

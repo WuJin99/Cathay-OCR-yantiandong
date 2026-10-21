@@ -1,0 +1,11 @@
+<root version="v2.1">
+	<!-- -->
+	<User />
+	<!--相机配置-->
+	<Cameras>
+        <plate_up enable="1" name="plate_up" ipaddr="192.168.18.30" port="37777" user_name="admin" pass_word="Cathay@2024"/>
+		<plate_down enable="1" name="plate_down" ipaddr="192.168.18.31" port="37777" user_name="admin" pass_word="Cathay@2024"/>
+		<!-- 托架车牌相机 -->
+		<plate_tailer enable="1" name="plate_tailer" ipaddr="192.168.18.32" port="37777" user_name="admin" pass_word="Cathay@2024"/>
+	</Cameras>		
+</root>

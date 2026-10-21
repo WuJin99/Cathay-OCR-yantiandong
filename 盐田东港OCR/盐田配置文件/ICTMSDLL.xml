@@ -1,0 +1,6 @@
+<GalaxyVism version="v2.1">
+	<!-- debug="是否进行调试,1调试，0不调试" deviceName="模块名称" type:车道类型 1-进闸 2-出闸 gate:闸口代码 车道号-->
+    <User debug="1" deviceName="ICTMS" type="2" gate="421801" lane="203"/>
+	<SendTCP ip="127.0.0.1" port="8870" sendTimeo="1000" recvTimeo="1000"/>
+	<RecvTCP ip="10.34.26.3" port="889" sendTimeo="1000" recvTimeo="1000"/>
+</GalaxyVism>

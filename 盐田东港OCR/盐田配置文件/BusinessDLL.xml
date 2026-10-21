@@ -1,0 +1,16 @@
+<GalaxyVism version="v2.1">
+
+	<!-- GaherDataWithID：该通道上传采集信息是是否需要身份证信息 0：不需要 1：需要 id:闸口代码 laneType:通道类型 I:入闸 E：出闸-->
+			<!-- welcomMsg -->
+		<!-- truckInMsg -->
+		<!-- dealMsg -->
+		<!-- speakerMsgIdcard -->
+		<!-- speakerMsgIdcardUpdate -->
+		<!-- speakerMsgIdcardIgnore -->
+	<BusinessParam GaherDataWithID="1" GatherOutTime="50" id="421801" laneType="E" imageMapDir="\\10.34.26.3\image\" imageLocalDir="D:\image\" imageKeepDays="90"  welcomMsg="QQCT欢迎您" truckInMsg="请刷身份证" dealMsg="系统正在处理，请等待..." speakerMsgIdcard="读取身份证完成,请等待系统处理" speakerMsgIdcardUpdate="二次读取身份证完成,请等待"  speakerMsgIdcardIgnore="系统正在处理，请勿重复刷身份证"/>
+	
+	<!-- OutTime:电子关封数据超时时间秒 enable:使能电子关封 0：不可用， 1：可用 -->
+	<eSeal OutTime="5" enable="0"/>
+	
+	<customConFile configFile="CustomsData.xml"/>
+</GalaxyVism>

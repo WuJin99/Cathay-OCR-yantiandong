@@ -1,0 +1,1040 @@
+<GalaxyVism version="v2.1">
+<!--说明：条件因子，触发事件的条件变量如下，配置触发事件，只能在以下条件变量中选择一个或多个组合
+
+        int trollyMin;      	// 根据小车编码器的范围值触发
+        int trollyMax;
+        int hoistMin;       	// 根据起升编码器范围值触发
+        int hoistMax;
+        int trollyStatus;   	// 根据小车动作触发 0：无效； 1: 向前(海); 2: 向后(岸); 3: 停止
+        int hoistStatus;    	// 根据起升动作触发 0：无效； 1：上升;2：下降 3：停止
+        int lockStatus;    		// 根据开闭锁状态触发: 0：无效；1: 开锁; 2: 闭锁
+        int catchStatus;    	// 根据着箱状态触发:0：无效； 1: 着箱; 2: 非着箱
+		int spreaderShape;      // 根据吊具类型判断：0：无效；1：单海测；2：双吊具；3：双吊具海测；4：双吊具路测；
+        int spreaderMode;   	// 根据吊具模式触发: 0：未知；1：20 尺；2：40 尺；3：45 尺；4：双 20 尺
+
+        int trollyPassValue;  // 根据小车越过某个值触发
+		int hoistPassValue;     // 起升经过某个值触发
+        int hoistPassValueDown; // 起升减小经过某个值触发
+		int hoistPassValueUp  // 起升向上经过某个点触发
+        int lockAction;       // 根据开闭锁动作: 1:开 -> 闭; 2:   闭 -> 开
+        int catchAction;      // 根据着箱变化:   1: 着箱产生; 2: 着箱消失
+        int spreaderAction;   // 根据吊具模式触发: 1: 变单20; 2: 变单40; 3: 变双箱
+		int hoistAction;		//吊具发生的动作 1：上升动作发生停->上升或者下降->上升 2：下降动作发生停->下降或者上升->下降
+        int hoistAbove;       // 根据开锁后起升上升一定值后触发
+        int onceCatch;        // 一次着箱  1：时间判断一次着箱 2：开闭锁判断一次着箱
+        int lockOccur;       	// 发生开闭锁动作: 1:发生开闭锁 2:未发生开闭锁
+		int hoistRangeMax;    // 起升范围最大值
+        int hoistRangeMin;    // 起升范围最小值
+        int trollyRangeMax;   // 小车范围最大值
+        int trollyRangeMin;   // 小车范围最小值
+
+		int cpsDistanceLess          //对位距离小于某值
+		int cpsDistancePassValueDown //对位距离减小经过某值
+		int cpsStatus                //对位状态等于某值
+		int cpsCnPos;			    //cps压箱位置，0:无，1：前,2:中,3:后
+		int cpsStatusFinishOccur     //cps对位完成状态是否发生0=未发生，1=发生
+		int cpsStatusLeaveOccur;   //集卡离开状态发生 0：未发生 1：发生
+
+		int ContPosOffset;		   //吊具带箱位移，大于该值时吊具摄像头采集图像用于检测箱门是否打开
+        int hoistToContPassValueDown;//吊具到目标箱顶距离，减小经过某值，用于吊具摄像头采集箱顶图像识别箱号
+		int truckType				//1内集卡，2外集卡
+		int worktype				//进出箱类型：1：进箱，2：出箱，0：非集装箱任务
+		int taskAction				//任务事件，PLC开始需要0CR发送结果，plc中taskid变为非0
+		AUTO_CAP="C04_CAP_CON"
+		//识别类型rtype:1/2/3/4。。
+		CN=1;	        // 识别箱号
+		SEAL = 2;	    // 识别铅封
+		IMDG = 3;	    // 识别危标
+		DOOR = 4;	    // 识别箱门
+		DOOR_OPEN = 5;	// 识别箱门打开
+		DAMAGE = 6;	    // 验残
+		PMN = 7;        // 识别集卡车车顶号
+		PMN_QR = 8;     // 识别集卡车车顶号 添加二维码车号识
+-->
+    <Lanes>
+	<!-- 1:卷盘侧，内集卡，电气房测，后停止50米()；2：非卷盘侧，外集卡，非电气房侧，前停止(5770)，2号机抓箱到5849；单位cm-->
+		<Lane1 trollyMin="800" trollyMax="1706" LaneNum="1"/>
+		<Lane2 trollyMin="5498" trollyMax="5970" LaneNum="2"/>
+		<Lane3 trollyMin="1707" trollyMax="5497" LaneNum="3"/>
+    </Lanes>
+	<Position>
+		<!-- 吊具摄像头安装位置（C11-2-左-车头-识别出来发2，1右），箱门方向配置，4号机,1左2右，1车头，2车尾-->
+		<HEAD_1_TAIL_2 C11="1" C12="2" C04='2' C05='1' C09='2' C10='1' />
+	</Position>
+    <Task>
+		<LOAD_LOCK_UP_SEND evtType="DATA_SEND" sendResult="0">
+            <NecessaryCond/>
+            <SufficientCond>
+            </SufficientCond>
+        </LOAD_LOCK_UP_SEND>
+    </Task>
+    <HK>
+	<!-- 1:卷盘侧，内集卡，电气房测 -->
+		<!-- 卷盘侧 车号相机 -->
+		<!-- 识别车顶号 -->
+		<C01 usable="1" camName="C01" ip="10.184.51.57" nPort="8000" userName="admin" passwd="Sany1212." lane="1">
+			<Events>
+
+				<C01_CAP_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond  workLane="1" />
+					<SufficientCond>
+
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> -->
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="381,57,341,1593" rotate="90" reverse="0" rectify=""/>
+						<!-- <PMN rtype="7" roi="" rotate="-90" reverse="0" rectify=""/> -->
+					</RecogType>
+				</C01_CAP_PMN>
+				<C01_CAP1_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond cpsStatus="1" workLane="1" />
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="381,57,341,1593" rotate="90" reverse="0" rectify=""/>
+
+					</RecogType>
+				</C01_CAP1_PMN>
+				<C01_CAP2_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond TruckInLane="1" />
+					<SufficientCond>
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="381,57,341,1593" rotate="90" reverse="0" rectify=""/>
+					</RecogType>
+				</C01_CAP2_PMN>
+				<C01_TASK_CAP_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond taskAction="1" workLane="1"/>
+					 <SufficientCond>
+					 <cpsDistancePassValueDown0 cpsDistancePassValueDown="0"  />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="381,57,341,1593" rotate="90" reverse="0" rectify=""/>
+					</RecogType>
+				</C01_TASK_CAP_PMN>
+
+            </Events>
+        </C01>
+
+
+		<!-- 卷盘侧20尺箱号相机 -->
+		<C02 usable="1" camName="C02" ip="10.184.51.61" nPort="8000" userName="admin" passwd="Sany1212." lane="1">
+			<Events>
+				<!-- 20尺作业，识别侧面箱号 -->
+				<!-- 20尺作业，对位触发 -->
+				<C02_CAP_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  workLane="1" worktype="1" cpsCnPos="3" />
+					<SufficientCond>
+
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C02_CAP_CON>
+
+				<C020_CAP_CON20_B1 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="1" worktype="1" cpsCnPos="3" />
+					<SufficientCond>
+
+						<cnPosBcountPass cnPosBcountPass="20"/>
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C020_CAP_CON20_B1>
+				<C020_CAP_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond workLane="1" worktype="1" cpsCnPos="1" />
+					<SufficientCond>
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C020_CAP_CON>
+
+				<C020_CAP_CON1 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1"  workLane="1" worktype="1" cpsCnPos="1" />
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C020_CAP_CON1>
+
+            </Events>
+        </C02>
+		<!-- 卷盘侧40尺箱号相机 -->
+		<C03 usable="1" camName="C03" ip="10.184.51.60" nPort="8000" userName="admin" passwd="Sany1212." lane="1">
+			<Events>
+				<!-- 40尺作业，识别侧面箱号 -->
+				<!-- 40尺作业，对位触发 -->
+				<C03_CAP_CON_40 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="2" workLane="1" worktype="1"/>
+					<SufficientCond>
+						<!-- <cpsDistancePassValueDown0 cpsDistancePassValueDown="0" /> -->
+						<!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> -->
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C03_CAP_CON_40>
+
+				<C03_CAP_CON1_40 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="2" cpsStatus="1" workLane="1" worktype="1"/>
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C03_CAP_CON1_40>
+
+				<C03_CAP_CON_45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="3" workLane="1" worktype="1"   />
+					<SufficientCond>
+						<!-- <cpsDistancePassValueDown0 cpsDistancePassValueDown="0" /> -->
+						<!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> -->
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C03_CAP_CON_45>
+
+				<C03_CAP_CON1_45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="3" cpsStatus="1" workLane="1" worktype="1"   />
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C03_CAP_CON1_45>
+
+            </Events>
+        </C03>
+	    <!-- 卷盘侧右侧球机 -->
+		<C04 usable="1" camName="C04" ip="10.184.51.62" nPort="8000" userName="admin" passwd="Sany1212." lane="1">
+			<Events>
+				<!--  -->
+				<!-- <C04_CAP_CON20 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond workLane="1" worktype="1" cpsCnPos="3"/>   -->
+					<!-- <SufficientCond> -->
+
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+
+					<!-- </RecogType> -->
+				<!-- </C04_CAP_CON20> -->
+
+				<C04_CAP_CON20_B1 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="1" worktype="1" cpsCnPos="3" />
+					<SufficientCond>
+
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C04_CAP_CON20_B1>
+				<!-- <C04_CAP_CON40 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond lockStatus="1" workLane="1" worktype="1" spreaderMode="2"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+					    <!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>  -->
+
+					<!-- </RecogType> -->
+				<!-- </C04_CAP_CON40> -->
+
+				<C04_CAP1_CON40 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  cpsStatus="1" workLane="1" worktype="1" spreaderMode="2" />
+					<SufficientCond>
+
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C04_CAP1_CON40>
+
+				<!-- <C04_CAP_CON45 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond lockStatus="1" workLane="1" worktype="1" spreaderMode="3"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+					    <!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>  -->
+
+					<!-- </RecogType> -->
+				<!-- </C04_CAP_CON45> -->
+
+				<C04_CAP1_CON45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="1" worktype="1"  spreaderMode="3"/>
+					<SufficientCond>
+
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C04_CAP1_CON45>
+				<!-- 使用对位进行跳转  -->
+				<C04_SET_40FT_DOOR evtType="SET" P="490" T="-470" Z="10" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="1" lockStatus="1" spreaderMode="2" />
+                    <SufficientCond>
+
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C04_SET_40FT_DOOR>
+				<C04_SET_45FT_DOOR evtType="SET" P="470" T="-410" Z="10" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="1" lockStatus="1" spreaderMode="3" />
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C04_SET_45FT_DOOR>
+				<C04_SET_20FT_DOOR evtType="SET" P="700" T="-540" Z="15" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="1" lockStatus="1" spreaderMode="1" cpsCnPos="3"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C04_SET_20FT_DOOR>
+
+            </Events>
+        </C04>
+
+
+		<!-- 卷盘侧左侧球机 -->
+		<C05 usable="1" camName="C05" ip="10.184.51.59" nPort="8000" userName="admin" passwd="Sany1212." lane="1">
+			<Events>
+				<!-- <C05_CAP_CON20 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond  workLane="1" worktype="1"  cpsCnPos="1"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <!-- <cpsDistancePassValueDown0 cpsDistancePassValueDown="0" /> --> -->
+						<!-- <!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> --> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>  -->
+					<!-- </RecogType> -->
+				<!-- </C05_CAP_CON20> -->
+				<C05_CAP1_CON20 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  workLane="1" worktype="1" cpsCnPos="1" cpsStatus="1" />
+					<SufficientCond>
+
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C05_CAP1_CON20>
+				<!-- <C05_CAP_CON45 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond lockStatus="1" workLane="1" worktype="1" spreaderMode="3" />   -->
+					<!-- <SufficientCond> -->
+						<!-- <!-- <cpsDistancePassValueDown0 cpsDistancePassValueDown="0" /> --> -->
+						<!-- <!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> --> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C05_CAP_CON45> -->
+				<C05_CAP1_CON45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="1" worktype="1" spreaderMode="3"/>
+					<SufficientCond>
+
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+
+					</RecogType>
+				</C05_CAP1_CON45>
+				<!-- <C05_CAP_CON40 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond lockStatus="1" workLane="1" worktype="1"  spreaderMode="2"/>   -->
+					<!-- <SufficientCond> -->
+
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C05_CAP_CON40> -->
+
+				<C05_CAP1_CON40 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond workLane="1" worktype="1" spreaderMode="2" cpsStatus="1"/>
+					<SufficientCond>
+
+
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+
+					</RecogType>
+				</C05_CAP1_CON40>
+				<!-- 使用对位进行跳转  -->
+				<C05_SET_40FT_DOOR evtType="SET" P="2960" T="-460" Z="10" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="1" lockStatus="1" spreaderMode="2"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C05_SET_40FT_DOOR>
+				<C05_SET_45FT_DOOR evtType="SET" P="2980" T="-430" Z="10" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="1" lockStatus="1" spreaderMode="3" />
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C05_SET_45FT_DOOR>
+				<C05_SET_20FT_DOOR evtType="SET" P="2840" T="-590" Z="15" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="1" lockStatus="1" spreaderMode="1" cpsCnPos="1"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C05_SET_20FT_DOOR>
+
+            </Events>
+        </C05>
+
+
+	<!-- 非卷盘侧 -->
+	<!-- 非卷盘侧车号相机 -->
+		<C06 usable="1" camName="C06" ip="10.184.51.51" nPort="8000" userName="admin" passwd="Sany1212." lane="2">
+			<Events>
+				<C06_CAP_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond workLane="2"/>
+					<SufficientCond>
+
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="329,117,332,1520" rotate="-90" reverse="0" rectify=""/>
+						<!-- <PMN rtype="7" roi="" rotate="-90" reverse="0" rectify=""/> -->
+					</RecogType>
+				</C06_CAP_PMN>
+				<C06_CAP1_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond cpsStatus="1" workLane="2"/>
+					<SufficientCond>
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="329,117,332,1520" rotate="-90" reverse="0" rectify=""/>
+						<!-- <PMN rtype="7" roi="" rotate="-90" reverse="0" rectify=""/> -->
+					</RecogType>
+				</C06_CAP1_PMN>
+				<C06_CAP2_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond cpsStatus="1" workLane="2"/>
+					<SufficientCond>
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="329,117,332,1520" rotate="-90" reverse="0" rectify=""/>
+						<!-- <PMN rtype="7" roi="" rotate="-90" reverse="0" rectify=""/> -->
+					</RecogType>
+				</C06_CAP2_PMN>
+				<C06_TASK_CAP_PMN evtType="CAP" sendResult="0">
+					<NecessaryCond TruckInLane="2" />
+					<SufficientCond>
+					</SufficientCond>
+					<RecogType>
+						<PMN rtype="7" roi="329,117,332,1520" rotate="-90" reverse="0" rectify="" />
+						<!-- <PMN rtype="7" roi="" rotate="-90" reverse="0" rectify=""/> -->
+					</RecogType>
+				</C06_TASK_CAP_PMN>
+
+            </Events>
+        </C06>
+
+		<!-- 非卷盘侧20尺箱号相机 -->
+		<C07 usable="1" camName="C07" ip="10.184.51.55" nPort="8000" userName="admin" passwd="Sany1212." lane="2">
+			<Events>
+				<!-- 20尺作业，箱号 -->
+				<!-- 20尺作业，对位触发 -->
+				<C07_CAP_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond workLane="2" worktype="1" cpsCnPos="3" />
+					<SufficientCond>
+
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C07_CAP_CON>
+				<C07_CAP_CON20_B1 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="2" worktype="1" cpsCnPos="3" />
+
+					<SufficientCond>
+
+						<TaskIdchangeoccur cnPosBcountPass="20"/>
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+
+					</RecogType>
+				</C07_CAP_CON20_B1>
+
+				<C07_CAP_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  workLane="2" worktype="1" cpsCnPos="1" />
+					<SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown1 cpsDistancePassValueDown="1" />
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C07_CAP_CON>
+
+				<C07_CAP1_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  workLane="2" worktype="1" cpsCnPos="1" cpsStatus="1"/>
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C07_CAP1_CON>
+
+            </Events>，
+        </C07>
+
+		<!-- 非卷盘侧40尺箱号相机 -->
+		<C08 usable="1" camName="C08" ip="10.184.51.54" nPort="8000" userName="admin" passwd="Sany1212." lane="2">
+			<Events>
+				<!-- 40尺作业，箱号 -->
+				<!-- 40尺作业，对位触发 -->
+				<C08_CAP_CON_40 evtType="CAP" sendResult="0">
+
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="2" workLane="2" worktype="1" />
+					<SufficientCond>
+						<!-- <cpsDistancePassValueDown0 cpsDistancePassValueDown="0" /> -->
+						<!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> -->
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C08_CAP_CON_40>
+
+				<C08_CAP_CON1_40 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="2" workLane="2" worktype="1" cpsStatus="1"/>
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C08_CAP_CON1_40>
+
+				<C08_CAP_CON_45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="3"  workLane="2" worktype="1"/>
+					<SufficientCond>
+						<!-- <cpsDistancePassValueDown0 cpsDistancePassValueDown="0" /> -->
+						<!-- <cpsDistancePassValueDown100 cpsDistancePassValueDown="200" /> -->
+						<cpsStatusFinishOccur cpsStatusFinishOccur="1" />
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C08_CAP_CON_45>
+
+				<C08_CAP_CON1_45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond spreaderMode="3"  workLane="2" worktype="1" cpsStatus="1"/>
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C08_CAP_CON1_45>
+            </Events>
+        </C08>
+		 <!-- 非卷盘侧右侧球机 -->
+		<C09 usable="1" camName="C09" ip="10.184.51.56" nPort="8000" userName="admin" passwd="Sany1212." lane="2">
+			<Events>
+				<!--  -->
+				<!-- <C0920_CAP_CON evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  -->
+					<!-- <NecessaryCond workLane="2" worktype="1" cpsCnPos="1"  />   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C0920_CAP_CON> -->
+
+				<C09_CAP1_CON20 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  workLane="2" worktype="1" cpsCnPos="3" cpsStatus="1"/>
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C09_CAP1_CON20>
+
+				<!-- <C0940_CAP_CON evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond  workLane="2" worktype="1" spreaderMode="2"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C0940_CAP_CON> -->
+				<C0940_CAP1_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="2" worktype="1" spreaderMode="2"/>
+					<SufficientCond>
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C0940_CAP1_CON>
+				<!-- <C0945_CAP_CON evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  --> -->
+					<!-- <NecessaryCond  workLane="2" worktype="1"  spreaderMode="3"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C0945_CAP_CON> -->
+
+				<C0945_CAP1_CON evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="2" worktype="1"  spreaderMode="3"/>
+					<SufficientCond>
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C0945_CAP1_CON>
+
+				<!-- 使用对位进行跳转  -->
+				<C09_SET_40FT_DOOR evtType="SET" P="2780" T="450" Z="15" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="2" lockStatus="1" spreaderMode="2"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown100 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C09_SET_40FT_DOOR>
+				<C09_SET_45FT_DOOR evtType="SET" P="2800" T="490" Z="10" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="2" lockStatus="1" spreaderMode="3"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown100 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C09_SET_45FT_DOOR>
+				<C09_SET_20FT_DOOR evtType="SET" P="2780" T="340" Z="15" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="2" lockStatus="1" spreaderMode="1" cpsCnPos="3"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown100 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="3"/>
+                    </SufficientCond>
+				</C09_SET_20FT_DOOR>
+            </Events>
+        </C09>
+
+		<!-- 非卷盘侧左侧球机 -->
+		<C10 usable="1" camName="C10" ip="10.184.51.53" nPort="8000" userName="admin" passwd="Sany1212." lane="2">
+			<Events>
+
+				<!-- <C10_CAP_CON20 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  -->
+					<!-- <NecessaryCond workLane="2" worktype="1" cpsCnPos="3" />   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>  -->
+					<!-- </RecogType> -->
+				<!-- </C10_CAP_CON20> -->
+
+				<C010_CAP_CON20_B1 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="2" worktype="1" cpsCnPos="1" />
+					<SufficientCond>
+
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C010_CAP_CON20_B1>
+				<!-- <C10_CAP_CON40 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  -->
+					<!-- <NecessaryCond lockStatus="1" workLane="2" worktype="1" spreaderMode="2"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C10_CAP_CON40> -->
+				<C010_CAP1_CON40 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond  cpsStatus="1" workLane="2" worktype="1" spreaderMode="2"  />
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C010_CAP1_CON40>
+				<!-- <C10_CAP_CON45 evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）  -->
+					<!-- <NecessaryCond lockStatus="1" workLane="2" worktype="1" spreaderMode="3"/>   -->
+					<!-- <SufficientCond> -->
+						<!-- <cpsStatusFinishOccur cpsStatusFinishOccur="1" /> -->
+					<!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/> -->
+						<!-- <DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/> -->
+					<!-- </RecogType> -->
+				<!-- </C10_CAP_CON45> -->
+
+				<C10_CAP1_CON45 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）  -->
+					<NecessaryCond cpsStatus="1" workLane="2" worktype="1" spreaderMode="3"/>
+					<SufficientCond>
+
+						<PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+					</SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+				</C10_CAP1_CON45>
+
+				<!-- 使用对位进行跳转  -->
+				<C10_SET_40FT_DOOR evtType="SET" P="3510" T="460" Z="15" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="2" lockStatus="1" spreaderMode="2"/>
+                    <SufficientCond>
+							<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown100 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+                    </SufficientCond>
+				</C10_SET_40FT_DOOR>
+				<C10_SET_45FT_DOOR evtType="SET" P="3420" T="510" Z="10" sendResult="0" DECODE="1">
+                   <NecessaryCond workLane="2" lockStatus="1" spreaderMode="3"/>
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown100 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+                    </SufficientCond>
+				</C10_SET_45FT_DOOR>
+				<C10_SET_20FT_DOOR evtType="SET" P="50" T="350" Z="15" sendResult="0" DECODE="1">
+				   <!-- 触发事件必要条件（唯一） -->
+                   <NecessaryCond workLane="2" lockStatus="1" spreaderMode="1" cpsCnPos="1" />
+                    <!-- 触发事件充分条件（多个） -->
+                    <SufficientCond>
+						<cpsDistancePassValueDown0 cpsDistancePassValueDown="0" />
+						<cpsDistancePassValueDown100 cpsDistancePassValueDown="1" />
+						 <PlcPacketsCounter PlcPacketsCounterForTaskPass="5"/>
+                    </SufficientCond>
+				</C10_SET_20FT_DOOR>
+            </Events>
+        </C10>
+
+
+    </HK>
+	<AxisF44>
+		<!-- 吊具摄像头，识别箱顶号、箱门方向、箱门打开 -->
+		<C11 usable="1" camName="C11" ip="10.184.51.63" nPort="8000" userName="root" passwd="Sany1212." channel="1" lane="3">
+            <Events>
+				<!-- 吊具距离箱顶2米时识别箱顶号 -->
+				<C11_CAP_TOP evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond hoistToContPassValueDown="200" Lane="3"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+                    </SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="256,61,958,654" rotate="0" reverse="0" rectify=""/>
+
+					</RecogType>
+                </C11_CAP_TOP>
+				<C11_CAP1_TOP evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond hoistToContPassValueDown="200" Lane="3"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+                    </SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="697,505,1040,506" rotate="180" reverse="0" rectify=""/>
+
+					</RecogType>
+                </C11_CAP1_TOP>
+				<!-- 吊具距离箱顶0.5米时识别箱门打开 -->
+				<!-- <C11_CAP_TOP_DOOROPEN_ONE evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）-->
+                    <!-- <NecessaryCond hoistToContPassValueDown="50"/> -->
+					<!-- <!-- 触发事件充分条件（多个） -->
+					<!-- <SufficientCond> -->
+                    <!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <DOOR_OPEN rtype="5" roi="15,99,1689,549" rotate="0" reverse="0" rectify=""/> -->
+
+					<!-- </RecogType> -->
+                <!-- </C11_CAP_TOP_DOOROPEN_ONE> -->
+				<!-- 吊具着箱识别箱号，箱门方向，打开 -->
+				<C11_CAP_TOPDOOR evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond catchAction="1"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+						<Lane3  Lane="3"/>
+                    </SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify="19,247,1867,467"/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify="25,225,1855,529"/>
+						<!-- <DOOR rtype="4" roi="" rotate="180" reverse="0" rectify="65,395,1813,457"/>  -->
+						<DOOR_OPEN rtype="5" roi="" rotate="0" reverse="0" rectify="25,225,1855,529"/>
+					</RecogType>
+                </C11_CAP_TOPDOOR>
+				<!-- 吊具着箱识别箱门方向，打开 -->
+				<C11_CAP_TOPDOOR_LANE evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond catchAction="1"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+						<Lane1  Lane="1"/>
+						<Lane2  Lane="2"/>
+                    </SufficientCond>
+					<RecogType>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify="65,395,1813,457"/>
+						<DOOR_OPEN rtype="5" roi="" rotate="0" reverse="0" rectify="25,225,1855,529"/>
+					</RecogType>
+                </C11_CAP_TOPDOOR_LANE>
+				<!-- 闭锁后每移动1.5米识别一次箱门打开-->
+                <C11_CAP_OPEN evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond ContPosOffset="150"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+                    </SufficientCond>
+					<RecogType>
+						<DOOR_OPEN rtype="5" roi="" rotate="0" reverse="0" rectify="25,225,1855,529"/>
+					<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify="25,225,1855,529"/>
+					</RecogType>
+                </C11_CAP_OPEN>
+            </Events>
+        </C11>
+		<C12 usable="1" camName="C12" ip="10.184.51.63" nPort="8000" userName="root" passwd="Sany1212." channel="3" lane="3">
+            <Events>
+				<!-- 吊具距离箱顶1.5米时识别箱顶号 -->
+				<C12_CAP_TOP evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond hoistToContPassValueDown="150" Lane="3"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+                    </SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="271,7,1034,598" rotate="0" reverse="0" rectify=""/>
+
+					</RecogType>
+                </C12_CAP_TOP>
+				<C12_CAP_TOP180 evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond hoistToContPassValueDown="150" Lane="3"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+                    </SufficientCond>
+					<RecogType>
+						<CN rtype="1" roi="705,517,1833,961" rotate="180" reverse="0" rectify=""/>
+
+					</RecogType>
+                </C12_CAP_TOP180>
+				<!-- 吊具距离箱顶0.5米时识别箱门打开 -->
+				<!-- <C12_CAP_TOP_DOOROPEN_ONE evtType="CAP" sendResult="0"> -->
+					<!-- <!-- 触发事件必要条件（唯一）-->
+                    <!-- <NecessaryCond hoistToContPassValueDown="50"/> -->
+					<!-- <!-- 触发事件充分条件（多个） -->
+					<!-- <SufficientCond> -->
+                    <!-- </SufficientCond> -->
+					<!-- <RecogType> -->
+						<!-- <DOOR_OPEN rtype="5" roi="19,83,1615,555" rotate="0" reverse="0" rectify=""/> -->
+
+					<!-- </RecogType> -->
+                <!-- </C12_CAP_TOP_DOOROPEN_ONE> -->
+				<!-- 吊具着箱识别箱号，箱门方向，打开 -->
+				<C12_CAP_TOPDOOR evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond catchAction="1"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+						<Lane3  Lane="3"/>
+                    </SufficientCond>
+					<RecogType>
+						<!--<CN rtype="1" roi="" rotate="0" reverse="0" rectify="199,270,1483,397"/>-->
+						<CN rtype="1" roi="" rotate="0" reverse="0" rectify="250,184,1385,404"/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify="39,91,1845,521"/>
+						<!-- <DOOR rtype="4" roi="" rotate="180" reverse="0" rectify="33,370,1861,603"/>  -->
+						<DOOR_OPEN rtype="5" roi="" rotate="0" reverse="0" rectify="487,129,1013,402"/>
+					</RecogType>
+                </C12_CAP_TOPDOOR>
+				<!-- 吊具着箱识别箱门方向，打开 -->
+				<C12_CAP_TOPDOOR_LANE evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond catchAction="1"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+						<Lane1  Lane="1"/>
+						<Lane2  Lane="2"/>
+                    </SufficientCond>
+					<RecogType>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify="39,91,1845,521"/>
+						<DOOR_OPEN rtype="5" roi="" rotate="0" reverse="0" rectify="487,129,1013,402"/>
+					</RecogType>
+                </C12_CAP_TOPDOOR_LANE>
+				<!-- 闭锁后每移动1.5米识别一次箱门打开-->
+                <C12_CAP_OPEN evtType="CAP" sendResult="0">
+					<!-- 触发事件必要条件（唯一）-->
+                    <NecessaryCond ContPosOffset="150" Lane="3"/>
+					<!-- 触发事件充分条件（多个） -->
+					<SufficientCond>
+                    </SufficientCond>
+					<RecogType>
+						<DOOR_OPEN rtype="5" roi="" rotate="0" reverse="0" rectify="487,129,1013,402"/>
+						<DOOR rtype="4" roi="" rotate="0" reverse="0" rectify=""/>
+					</RecogType>
+                </C12_CAP_OPEN>
+            </Events>
+		</C12>
+	</AxisF44>
+	<DH>
+	    <C13 usable="1" camName="C13" ip="10.184.51.58" nPort="37777" userName="admin" passwd="Sany1212." lane="2">
+            <Events>
+                <!-- 40尺作业，吊具在车道发生着箱识别侧面箱号 -->
+                <C13_CAP_CON evtType="CAP" sendResult="0">
+                    <!-- 触发事件必要条件（唯一）  -->
+                    <NecessaryCond catchAction="14" />
+                    <SufficientCond></SufficientCond>
+                    <RecogType>
+                        <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+                    </RecogType>
+                </C13_CAP_CON>
+            </Events>
+        </C13>
+		<C14 usable="1" camName="C14" ip="10.184.51.52" nPort="37777" userName="admin" passwd="Sany1212." lane="1">
+            <Events>
+                <!-- 40尺作业，吊具在车道发生着箱识别侧面箱号 -->
+                <C14_CAP_CON evtType="CAP" sendResult="0">
+                    <!-- 触发事件必要条件（唯一）  -->
+                    <NecessaryCond catchAction="14" />
+                    <SufficientCond></SufficientCond>
+                    <RecogType>
+                        <CN rtype="1" roi="" rotate="0" reverse="0" rectify=""/>
+                    </RecogType>
+                </C14_CAP_CON>
+            </Events>
+        </C14>
+	</DH>
+</GalaxyVism>

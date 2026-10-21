@@ -1,0 +1,8 @@
+﻿<GalaxyVism version="2.1">
+	<!-- ICTMSTCP:ICTMS通讯 CustomsCoverTCP:关封通讯 sendTimeo:发送超时时间(ms) recvTimeo:接收超时时间(ms),0代表阻塞 -->
+	<ICTMSTCP ip="127.0.0.1" port="9494" sendTimeo="1000" recvTimeo="1000"/>
+	<CustomsCoverTCP ip="127.0.0.1" port="9494" sendTimeo="1000" recvTimeo="1000"/>
+	<!-- debug="是否进行调试,1调试，0不调试" deviceName="模块名称" -->
+	<User debug="1" deviceName="CustomsCover"/>
+</GalaxyVism>
+

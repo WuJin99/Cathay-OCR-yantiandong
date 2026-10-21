@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GalaxyVism version="2.1">
+
+	<!-- <Sound text="系统正在处理，请勿重复刷身份证" timeinterval="3"/> -->
+	<!-- <LCD ip="127.0.0.1" port="9494" sendTimeo="1000" recvTimeo="1000" text="8号" font="微软雅黑" size="160"/> -->
+	<!-- <GateLED ip="192.168.18.50" port="5000" text1="请刷身份证" text2="" font="微软雅黑" size="20" file="play001.lst" color1="ff0000" color2="ff0000" playType="1" playTime="10" playSpeed="1"/> -->
+	<!-- <FrameLED ip="192.168.18.51" port="5000" text1="8号口" text2="QQCT欢迎您" font="微软雅黑" size="60" file="play002.lst" color1="ff0000" color2="ff0000" playType="1" playTime="10" playSpeed="1"/> -->
+	
+	<User debug="0" deviceName="֪PeripheralControl"/>
+	<!-- 喇叭播放时间间隔，单位:秒（循环播放情况下） -->
+	<Sound enable="1" timeinterval="3"/>
+	<!-- 液晶屏配置 sendTimeo：发送超时时间（毫秒） recvTimeo：接收超时时间（毫秒） -->
+	<LCD enable="1" ip="127.0.0.1" port="9494" sendTimeo="1000" recvTimeo="1000"/>
+	<!-- 小LED屏配置 -->
+	<GateLED enable="1" ip="192.168.18.50" port="5000" file="play001.lst"/>
+	<!-- 大LED屏配置 -->
+	<FrameLED enable="1" ip="192.168.18.51" port="5000" file="play002.lst"/>
+	
+	<!-- 声光报警器 -->
+	<SLAlarm enable="0" ip="" port="" />
+	
+	<!-- 空调连接参数  -->
+	<!-- port：485 串口号 -->
+	<!-- baud：485 波特率 -->
+	<!-- interval：获取数据间隔 -->
+	<AirCondationer enable="1" port="COM3" baud="9600" interval="60" >
+		<DataCmd >
+			<item enable="1" cmd="01 04 00 00 00 01" cmd_name="温度"/>
+		</DataCmd>
+		<AlarmCmd>
+			<item enable="1" cmd="01 02 00 00 00 01" cmd_name="回风温度传感器故障"/>
+			<item enable="1" cmd="01 02 00 01 00 01" cmd_name="冷凝盘管温度传感器故障"/>
+			<item enable="1" cmd="01 02 00 0A 00 01" cmd_name="高压力告警"/>
+			<item enable="1" cmd="01 02 00 0B 00 01" cmd_name="低压力告警"/>
+			<item enable="1" cmd="01 02 00 0C 00 01" cmd_name="回风高温告警"/>
+			<item enable="1" cmd="01 02 00 0D 00 01" cmd_name="回风低温告警"/>
+			<item enable="1" cmd="01 02 00 0E 00 01" cmd_name="柜外高温告警"/>
+			<item enable="1" cmd="01 02 00 0F 00 01" cmd_name="柜外低温告警"/>
+			<item enable="1" cmd="01 02 00 11 00 01" cmd_name="外部输入告警"/>
+			<item enable="1" cmd="01 02 00 14 00 01" cmd_name="蒸发盘管温度传感器故障"/>
+			<item enable="1" cmd="01 02 00 16 00 01" cmd_name="低电压告警"/>
+			<item enable="1" cmd="01 02 00 17 00 01" cmd_name="高电压告警"/>
+			<item enable="1" cmd="01 02 00 0B 00 01" cmd_name="蒸发器冻结告警"/>
+			<item enable="1" cmd="01 02 00 0E 00 01" cmd_name="冷凝高温告警"/>
+		</AlarmCmd>
+	</AirCondationer>
+	
+</GalaxyVism>

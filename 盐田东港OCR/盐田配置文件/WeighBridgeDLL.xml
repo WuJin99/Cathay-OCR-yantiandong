@@ -1,0 +1,15 @@
+<GalaxyVism version="v2.1">
+	<!--
+		debug        ="调试模式 0：不使能 1：使能"
+		device_name="设备名称"
+		lowerLimit ="发送数据的最小重量，单位KG"
+		delay_time   ="延时时间,单位:ms"
+	-->
+	<User debug="0" device_name="IND245" lower_limit="1000" delay_time="500"/>
+	<DEV>
+		<item lanetype="OUT"	lanename="OUT01" port="COM1" baud="9600" enable="1"/>
+	</DEV>
+	<HTTP enable="1" ipaddr="127.0.0.1" port="8085" weight_url="/api/weight"/>
+</GalaxyVism>
+
+

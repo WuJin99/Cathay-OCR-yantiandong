@@ -1,0 +1,19 @@
+<root version="v2.1">
+	<!--
+		debug        ="调试模式 0：不使能 1：使能"
+		device_name  ="设备名称，暂时无用"
+		delay_time   ="延时时间,单位:ms"
+	-->
+	<User debug="0" device_name="" delay_time="1000"/>
+	<!--
+		ip       ="相机设备ip"
+		port     ="相机设备端口号"
+		user_name="相机登录用户名"
+		pass_word="相机登录密码"
+		enable   ="是否启用当前相机，1：启用，0：不启用"
+	-->
+	<Cameras>
+        <left enable="1"  ipaddr="192.168.18.60"  port="80" user_name="admin" pass_word="Cathay@2024"/>
+		<left enable="1"  ipaddr="192.168.18.61"  port="80" user_name="admin" pass_word="Cathay@2024"/>
+	</Cameras>		
+</root>

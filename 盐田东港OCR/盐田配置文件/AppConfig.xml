@@ -1,0 +1,45 @@
+﻿<GalaxyVism version="v2.1">
+    <!-- PLC模块连接 0:MODBUS_RS232
+    <FTP enable="0" host="192.168.1.133" port="21" 1:TCP 2:RAW_RS232 3:UDP-->
+    <PLC commType="7" slaveAddr="1" readAddr="11800" writeAddr="12000" rrTimeout="15000" rrWaitTime="10">
+		<!--parity:none（0）/odd（1）/even（2） stopBits：one（0）/onepointfive（1）/two（2）-->
+        <Serial comPort="COM1" baudRate="19200" byteSize="8" stopBits="0" parity="0" flow_ctrl="1" dtrCtrl="1"/>
+        <Net localIP="10.184.50.110" localPort="8000" remoteIP="10.184.30.10" remotePort="2515"/>
+		<Http plcPath="/api/piis/ocr/support-data" waitTime="200" remoteIP="10.184.50.50" remotePort="9400" localHostIP="10.184.50.110" serverPort="9010" doorDirPath="/api/piis/ocr/container-door-orientation" doorOpenPath="/api/piis/ocr/container-door-open" cnDataPath="/api/cn/ocr/get-cn-data" pmnDataPath="/api/cn/ocr/get-pmn-data"/>
+    </PLC>
+    <!-- 消息代理连接 -->
+    <BROKER ipaddr="127.0.0.1" xpub_port="9500" sub_port="5863" resend_count="0"/>
+	<SUB>
+	<item enable="1" ipaddr="127.0.0.1" port="5600"/>
+	</SUB>
+    <!-- FTP配置参数 --> 
+	<FTP enable="0" host="192.168.1.133" port="21" usr="FTPUser" password="Ca123456" reSaveCounts="2"/>
+    <!-- CRS配置参数 -->
+    <CRS>
+      <item enable="1" ipaddr="127.0.0.1" port="10008"/>
+      <item enable="0" ipaddr="192.168.1.169" port="50001"/>
+	</CRS>
+    <!-- 用户模块设置   stateInfoInterval发送状态信息的间隔秒数 heartBeatInterval发送心跳的间隔秒数 heartBeatTimeout心跳不回复超时时间秒数-->
+    <USER quayNo="4" imgRootPath="http://10.184.50.110:8080/data/" IARSName="" sendInfoShow="1" localIp="10.184.37.65" savePath="D:/DATA" wait_ptz_sec="5" needReplyResend="30000" stateInfoInterval="2" heartBeatInterval="40" heartBeatTimeout="600" gantryChangeBayValue="0" sdk_log="1" only_pmn="0" ecs_ms="4000" door_open_count="1" reset_dooropen_by_hoist_value="1500"/>
+    <!-- 工控机资源阈值配置 百分比-->
+    <MONITOR cpu_rate="90" gpu_rate="98" diskfree_rate="10" memory_rate="90"/>
+    <OWNERNUMBER>
+		<!-- src="识别出来的结果，这个是错误的结果" dst="纠正后的结果"-->7
+		<!--<item src="KDCU" dst="KOCU"/>-->
+	</OWNERNUMBER>
+	<!-- 识别会对默写字母出错,进行箱号的ISO进行替换,item可以添加多个 -->
+	<ISONUMBER>
+		<!-- src="识别出来的结果，这个是错误的结果" dst="纠正后的结果"-->
+      <item src="4OU6" dst="40U6"/>
+      <item src="4DU6" dst="40U6"/>
+	</ISONUMBER>
+	<TRUCKNUM>
+	<item src="1" dst="I"/>
+	</TRUCKNUM>
+    <!-- 海陆侧作业车道及配置文件设置 name为Sea和Land，lane_id需要与ECS发送的JobTrigger一致，cfg根据实际情况修改 -->
+    <LANESIDE>
+		<Lane name="Land" lane_id="1" cfg="CameraConfig.xml"/>
+	</LANESIDE>
+</GalaxyVism>
+
+

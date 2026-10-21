@@ -1,0 +1,9 @@
+<GalaxyVism version="v2.1">
+	
+	<!-- 用户配置 imgPath="照片存储路径" -->
+	<User imgPath="D:/Data/" />
+	
+	<!-- 数据库配置 -->
+	<DbConfig dbHost="192.168.31.125" dbPort="1521" dbName="ORCL" dbUsr="CATHAY_GATE" dbPwd="CATHAY_GATE" useMysql="0"/>
+	<!-- <DbConfig dbHost="192.168.31.120" dbPort="152" dbName="helowin" dbUsr="test11" dbPwd="test11" useMysql="0"/> -->
+</GalaxyVism>

@@ -1,0 +1,38 @@
+<root version="v2.1">
+	<!--ShowSend为1显示发送的消息
+		ShowRecv为1显示接收到的消息
+	-->
+	<User ShowSend="1" ShowRecv="1"/>
+	<!--按需指定不需要发送到服务器的消息，需要设置 UnSendMsg enable=1
+		msg_url为指定的不需要发送的proto消息
+	-->
+	<UnSendMsg enable="0">
+		<item msg_url="ocrs.pb.MsgInfo"	enable="0"/>
+		<item msg_url="gos.pb.LaserScanParam" enable="1"/>
+		<item msg_url="ocrs.pb.RTask" 	enable="1"/>
+	</UnSendMsg>
+	<!--按需指定需要发送到服务器的消息，需要设置 SendMsg enable=1
+		msg_url为指定的需要发送的proto消息
+	-->
+	<SendMsg enable="1">
+		<item msg_url="gate.pb.LogInfo"	enable="1"/>
+		<item msg_url="gate.pb.StateInfo" enable="1"/>
+		<item msg_url="gate.pb.GatherData" 	enable="1"/>
+		<item msg_url="gate.pb.ICTMSToOutGateCustoms" 	enable="1"/>
+		<item msg_url="gate.pb.CustomsData" 	enable="1"/>
+	</SendMsg>
+	<!-- ZMQ 订阅配置 
+	timeout为超时时间，单位秒
+	sub_type为订阅类型
+	filter为指定需要订阅的消息格式
+	-->
+	<BrokerCfg heartbeat="30" resend_interval="30" recv_fail_count="500">
+		<broker>
+			<item name="Server201" ipaddr="10.34.25.201" xsub_port="9500" pub_port="5863" push_port="0" enable="1"/>
+			<item name="Server202" ipaddr="10.34.25.202" xsub_port="9500" pub_port="5863" push_port="0" enable="0"/>
+		</broker>
+		<filter>
+			<item filter="OUT03" enable="1"/>
+		</filter>
+	</BrokerCfg>
+</root>

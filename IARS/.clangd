@@ -1,0 +1,17 @@
+CompileFlags:
+    Add:
+        - --driver-mode=cl # 模拟msvc的cl.exe
+        - -std:c++17
+        - -EHsc # E`：启用 C++ 异常处理，`H`：使用标准 C++ 异常模型，`s`：假设函数只会通过 `throw` 抛出异常，`c`：假设 `extern "C"` 函数不会抛出异常
+        - -D_CRT_SECURE_NO_WARNINGS # 相当于在代码最前面定义#define _CRT_SECURE_NO_WARNINGS，关闭MSVC对C标准库的安全警告
+        - -DPROTOBUF_USE_DLLS # 相当于#define _CRT_SECURE_NO_WARNINGS，告诉protobuf头文件：项目使用的是protobuf动态库
+        - -D_CONSOLE # 表示这是控制台应用程序
+        - -D_WIN32_WINNT=0x600 # 指定最低windowsAPI版本，这里是windows server 2008
+        - -D_WINSOCK_DEPRECATED_NO_WARNINGS # 关闭 Winsock 旧接口的弃用警告
+
+        # project include zed中使用绝对路径
+        - -ID:/workspace/yantiandong/IARS/IARS
+        - -ID:/workspace/yantiandong/IARS/include
+        - -ID:/workspace/yantiandong/IARS/include/protomsg
+        - -ID:/workspace/yantiandong/IARS/include/protomsg/grpc/include
+        - -ID:/workspace/yantiandong/IARS/include/protomsg/grpc/include/address_sorting

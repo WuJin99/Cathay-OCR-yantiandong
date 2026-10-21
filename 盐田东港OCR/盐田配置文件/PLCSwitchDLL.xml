@@ -1,0 +1,18 @@
+<GalaxyVism version="v2.1">
+    <!-- PLC模块连接 -->
+    <PLC commType="7" slaveAddr="3950" regAddr="3901" rrTimeout="5000" rrWaitTime="100">
+		<!--parity:none（0）/odd（1）/even（2） stopBits：one（0）/onepointfive（1）/two（2）-->
+        <Serial comPort="COM1" baudRate="19200" byteSize="8" stopBits="0" parity="0" />
+        <Net localIP="192.168.18.8" localPort="3004" remoteIP="192.168.18.9" remotePort="3344" />
+    </PLC>
+    <!-- debug=是否进行调试,1调试，0不调试，暂时无用 deviceName=设备名称，用于发送状态消息的时候进行设备名称标识 stateinfoInterval=发送StateInfo消息时间间隔 -->
+    <User debug="0" deviceName="PLCSwitch" stateinfoInterval="80"/>
+	<!-- name 设备名称 type:设备类型 0=无类型 1=工控机 2=补光灯 3=道闸 port=对应plc端口-->
+	<Equipment>
+		<dev name="工控机" type="1" port="0"/>
+		<dev name="补光灯" type="2" port="1"/>
+		<dev name="道闸"   type="3" port="2"/>
+	</Equipment>
+</GalaxyVism>
+
+
