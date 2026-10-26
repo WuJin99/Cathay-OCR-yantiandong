@@ -10,7 +10,10 @@ void InitConsole(std::string logPath)
 
     AllocConsole();
     AttachConsole(GetCurrentProcessId());
-	string versionStr = "OCR-IARS-CN8917-P2301-RMG-V3.02.005.260928-023.4.5";
+    // 内部版本号
+	// string versionStr = "OCR-IARS-CN8917-P2301-RMG-V3.02.006.261026";
+	// 工程要求版本号
+	string versionStr = "OCR-IARS-CN8917-P2301-RMG-V3.02.005.260907-023.4.5";
     SetConsoleTitle(versionStr.c_str());
 
     //freopen("CONOUT$", "w", stdout);

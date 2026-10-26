@@ -1779,18 +1779,22 @@ void TaskManager::GetPmnResult(string& json_str)
 	cJSON_AddStringToObject(data, "CraneId", plc.craneId.c_str());
 
 	console->info("作业车道[{}]，有车车道[{}][{}]", plc.workLine, plc.hasTruck[1], plc.hasTruck[2]);
-	if (plc.workLine >= 1 && plc.hasTruck[plc.workLine] == 1)
-		;  // 作业车道有车
-	else if (plc.hasTruck[1] == 1)
-		plc.workLine = 1;  // 车道1有车
-	else if (plc.hasTruck[2] == 1)
-		plc.workLine = 2;  // 车道2有车
-	else if (plc.workLine >= 1)
+	// 打印日志，说明作业车道和有车情况
+	if (plc.workLine < 1)
 	{
-		console->info("无有车车道，保留原业车道[{}]",plc.workLine);
-	}
-	else
+		AddTaskLog(console->info("[pmn][send] 作业车道无效[{}]，不上传车顶号和车牌", plc.workLine));
 		plc.workLine = -1;
+	}
+	// 车道1，2无车
+	else if ((plc.workLine == 1 || plc.workLine == 2) && plc.hasTruck[plc.workLine] != 1)
+	{
+		const int otherLane = 3 - plc.workLine;
+		if (plc.hasTruck[otherLane] == 1)
+		{
+			AddTaskLog(console->info("[pmn][send] 作业车道[{}]无车，车道[{}]有车",
+				plc.workLine, otherLane));
+		}
+	}
 	cJSON_AddNumberToObject(data, "LandNo", plc.workLine);
 
 	string imgPath;
@@ -1816,10 +1820,18 @@ void TaskManager::GetPmnResult(string& json_str)
 	m_mtxPmnItem.lock();
 	const int reqGantry = plc.gantryValue; // PIIS 请求瞬间的大车编码器，车顶号/车牌发送窗共用
 	const int gantryDelta = g_AppConfig.userCfg.pmnWindowGantryDelta;
+	// 上传前作业车道必须有车；无车则车顶号/车牌都回空，池内残留不过滤掉但本次不发出
+	const bool workLaneHasTruck =
+		(plc.workLine >= 1 && plc.workLine <= 2 && plc.hasTruck[plc.workLine] == 1);
 	auto iter = m_arrPmnItem.find(plc.workLine);
 
-	// 车道内有样本时才计算
-	if (iter != m_arrPmnItem.end() && !iter->second.empty())
+	// 有车且车道内有样本时才计算
+	if (!workLaneHasTruck)
+	{
+		AddTaskLog(console->info("[pmn][send] 作业车道无车，PlateTop/TruckPlate 置空 workLine={} hasTruck1={} hasTruck2={}",
+			plc.workLine, plc.hasTruck[1], plc.hasTruck[2]));
+	}
+	else if (iter != m_arrPmnItem.end() && !iter->second.empty())
 	{
 		auto& arrRet = iter->second;
 
@@ -1918,11 +1930,19 @@ void TaskManager::GetPmnResult(string& json_str)
 		cJSON_AddStringToObject(data, "PlateTopPic", "");
 	}
 
-	// -------- 组包 TruckPlate：发送时按 reqGantry 窗口过滤，窗外置空但不清 m_arrPmnItem2 缓存 --------
+	// -------- 组包 TruckPlate：作业车道有车才上传；再按 reqGantry 窗口过滤，窗外置空但不清缓存 --------
 	const PmnResult* pPlateCache = nullptr;
 	bool plateInWindow = true;
 	auto plateIter = m_arrPmnItem2.find(plc.workLine);
-	if (plateIter != m_arrPmnItem2.end() && !plateIter->second.pmn.empty())
+	if (!workLaneHasTruck)
+	{
+		if (plateIter != m_arrPmnItem2.end() && !plateIter->second.pmn.empty())
+		{
+			AddTaskLog(console->info("[pmn][send] 作业车道无车，不上传车牌结果 lane={} plate=[{}]",
+				plc.workLine, plateIter->second.pmn));
+		}
+	}
+	else if (plateIter != m_arrPmnItem2.end() && !plateIter->second.pmn.empty())
 	{
 		pPlateCache = &plateIter->second;
 		plateInWindow = IsPlateInSendWindow(*pPlateCache, reqGantry, gantryDelta);
@@ -2435,6 +2455,19 @@ void TaskManager::SetPlateResult(LicPlateResult& plate_result, shared_ptr<cv::Ma
 		AddTaskLog(console->info("[pmn] 相机找不到车道:[{}]", plate_result.sCamIp));
 		return;
 	}
+	// 这里复用车顶号的函数，hastrcuk != 1 时直接丢弃，不写m_arrPmnItem2
+	// 与车顶号相同：该车道无车时不入库，避免过路车车牌在门控已关后写入且无法被清掉
+	{
+		string failReason;
+		if (!IsPmnCaptureWindow(plate_result.lane, &failReason))
+		{
+			const int ht = (plate_result.lane >= 1 && plate_result.lane <= 2)
+				? m_plcInfoState.GetCurPLCInfo().hasTruck[plate_result.lane] : -1;
+			AddTaskLog(console->info("[pmn][gate][plate] 门控未过丢弃 plate={} conf={} lane={} reason={} hasTruck={}",
+				plate_result.sLicPlate, plate_result.nBelieve, plate_result.lane, failReason, ht));
+			return;
+		}
+	}
 	// 截取车号后6位进行比较
 	std::string subpmn ="";
 	if (plate_result.sLicPlate.length() > 2)
@@ -2449,7 +2482,7 @@ void TaskManager::SetPlateResult(LicPlateResult& plate_result, shared_ptr<cv::Ma
 		m_planTruckMatch = true;
 	}
 	m_mtxPmnItem.lock();
-	// 始终写入缓存；发送时 GetPmnResult 按 gantry 窗口决定是否上传 TruckPlate
+	// 有车门控通过后写入缓存；发送时 GetPmnResult 按 gantry 窗口决定是否上传 TruckPlate
 	m_arrPmnItem2[plate_result.lane].type = PLCInfo::TRUCK_TYPE_OUTER;
 	m_arrPmnItem2[plate_result.lane].pmn = plate_result.sLicPlate;
 	m_arrPmnItem2[plate_result.lane].conf = plate_result.nBelieve;

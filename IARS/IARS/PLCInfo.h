@@ -392,15 +392,6 @@ struct PLCInfo              // PLC信息
 
 	unsigned short cpsDirection;		//海侧车头方向   0=无效;1=左;2=右
 
-
-
-
-
-
-
-
-
-
 	void ParseMsg(const ptree& plc);
 	unsigned short ParseShort(const unsigned char *pBuf, int& offset);
 	int ParseInt(const unsigned char *pBuf, int& offset);
