@@ -76,6 +76,8 @@ struct UserConfig
 	int pmnWindowGantryDelta;          // 拉号窗口：|样本gantry - PIIS请求时gantry| 容差，车顶号/车牌发送共用，默认1300≈13m
 	int pmnNoTruckClearFrames;         // hasTruck 1→0 连续无车帧数达此值才清车顶号池与车牌，默认3；0=不去抖(1帧即清)
 	int pmnPlateEarlyHoldMs;           // 车牌在 hasTruck=0 时暂存时长(ms)，有车后再入主池；默认2000；0=不暂存(无车直接丢)
+	int pmnRecentStreakK;              // 拉号：窗内按入池顺序最近连续同号≥K则选该号；默认3；≤0关闭
+	int pmnRecentFallbackM;            // 拉号：未达 streak 时仅用窗内最近 M 条做 nCount/conf；默认10；≤0用窗内全部
 };
 
 class TaskManager;

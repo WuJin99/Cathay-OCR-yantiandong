@@ -523,6 +523,24 @@ private:
 		string& outPmn,
 		PmnSet& outSet);
 
+	/**
+	 * 窗内选号（保持入池顺序）：
+	 * 1) 最近连续同号 ≥ streakK → 选该号（汇总连续段）；
+	 * 2) 否则只取窗内最近 fallbackM 条做 nCount/conf（fallbackM≤0 则用窗内全部）。
+	 * reason: "streak" / "recentM" / "empty"
+	 */
+	static bool SelectBestPmnRecent(
+		const std::vector<PmnResult>& samples,
+		int reqGantry,
+		int gantryDelta,
+		int streakK,
+		int fallbackM,
+		string& outPmn,
+		PmnSet& outSet,
+		string* outReason = nullptr,
+		int* outInWindow = nullptr,
+		int* outRecentUsed = nullptr);
+
 	static void FillPmnResultFromSet(
 		const string& pmn,
 		const PmnSet& set,

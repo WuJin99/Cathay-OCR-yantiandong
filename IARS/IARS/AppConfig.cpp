@@ -55,6 +55,9 @@ void ParseUserCfgNode(const ptree pNode)
 		g_AppConfig.userCfg.pmnNoTruckClearFrames = pNode.get<int>("<xmlattr>.pmnNoTruckClearFrames", 3);
 		// 车牌早于 PLC hasTruck 到达时暂存，有车后再入主池；默认 2000ms；0=关闭暂存
 		g_AppConfig.userCfg.pmnPlateEarlyHoldMs = pNode.get<int>("<xmlattr>.pmnPlateEarlyHoldMs", 2000);
+		// 排队换车：连续最新同号优先；否则只看最近 M 条（避免全池历史票压过后车）
+		g_AppConfig.userCfg.pmnRecentStreakK = pNode.get<int>("<xmlattr>.pmnRecentStreakK", 3);
+		g_AppConfig.userCfg.pmnRecentFallbackM = pNode.get<int>("<xmlattr>.pmnRecentFallbackM", 10);
     }
 }
 // 船公司映射列表配置

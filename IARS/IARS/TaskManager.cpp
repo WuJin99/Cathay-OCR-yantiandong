@@ -1754,6 +1754,96 @@ bool TaskManager::SelectBestPmn(
 	return !outPmn.empty();
 }
 
+bool TaskManager::SelectBestPmnRecent(
+	const std::vector<PmnResult>& samples,
+	int reqGantry,
+	int gantryDelta,
+	int streakK,
+	int fallbackM,
+	string& outPmn,
+	PmnSet& outSet,
+	string* outReason,
+	int* outInWindow,
+	int* outRecentUsed)
+{
+	outPmn.clear();
+	outSet = PmnSet();
+	if (outReason) *outReason = "empty";
+	if (outRecentUsed) *outRecentUsed = 0;
+
+	// 窗内样本，保持入池先后顺序
+	std::vector<const PmnResult*> inWin;
+	inWin.reserve(samples.size());
+	for (const auto& ret : samples)
+	{
+		if (abs(ret.GantryValue - reqGantry) <= gantryDelta)
+		{
+			inWin.push_back(&ret);
+		}
+	}
+	if (outInWindow)
+		*outInWindow = (int)inWin.size();
+	if (inWin.empty())
+	{
+		return false;
+	}
+
+	auto accumOne = [](PmnSet& s, const PmnResult& ret)
+	{
+		s.conf += ret.conf;
+		s.nCount += 1;
+		s.lastGantry = ret.GantryValue;
+		if (!ret.path.empty())
+			s.path = ret.path;
+		if (ret.fromQr)
+			s.fromQr = true;
+	};
+
+	// 1) 最近连续同号 ≥ streakK
+	if (streakK > 0 && (int)inWin.size() >= streakK)
+	{
+		const string& tailPmn = inWin.back()->pmn;
+		int streak = 0;
+		for (int i = (int)inWin.size() - 1; i >= 0; --i)
+		{
+			if (inWin[i]->pmn != tailPmn)
+				break;
+			++streak;
+		}
+		if (streak >= streakK)
+		{
+			PmnSet set;
+			for (int i = (int)inWin.size() - streak; i < (int)inWin.size(); ++i)
+				accumOne(set, *inWin[i]);
+			outPmn = tailPmn;
+			outSet = set;
+			if (outReason) *outReason = "streak";
+			if (outRecentUsed) *outRecentUsed = streak;
+			return true;
+		}
+	}
+
+	// 2) 兜底：窗内最近 M 条（M≤0 则全部）做 nCount/conf
+	int useN = (int)inWin.size();
+	if (fallbackM > 0 && fallbackM < useN)
+		useN = fallbackM;
+	std::map<string, PmnSet> recentSet;
+	for (int i = (int)inWin.size() - useN; i < (int)inWin.size(); ++i)
+	{
+		accumOne(recentSet[inWin[i]->pmn], *inWin[i]);
+	}
+	if (outRecentUsed)
+		*outRecentUsed = useN;
+	if (!SelectBestPmn(recentSet, outPmn, outSet))
+	{
+		if (outReason) *outReason = "empty";
+		return false;
+	}
+	if (outReason)
+		*outReason = (fallbackM > 0) ? "recentM" : "windowAll";
+	return true;
+}
+
 void TaskManager::FillPmnResultFromSet(
 	const string& pmn,
 	const PmnSet& set,
@@ -1852,29 +1942,35 @@ void TaskManager::GetPmnResult(string& json_str)
 	else if (iter != m_arrPmnItem.end() && !iter->second.empty())
 	{
 		auto& arrRet = iter->second;
+		const int streakK = g_AppConfig.userCfg.pmnRecentStreakK;
+		const int fallbackM = g_AppConfig.userCfg.pmnRecentFallbackM;
 
-		int inWindow = 0;
-		auto winSet = AggregatePmnInWindow(arrRet, reqGantry, gantryDelta, &inWindow);
-
-		// 诊断日志：窗内各号票数/置信度，便于核对排队车是否被窗口滤掉
+		// 诊断：仍打印全窗聚合，便于对照旧逻辑与排队叠票
+		int inWindowAll = 0;
+		auto winSetAll = AggregatePmnInWindow(arrRet, reqGantry, gantryDelta, &inWindowAll);
 		string tally;
-		for (auto& kv : winSet)
+		for (auto& kv : winSetAll)
 		{
 			tally += fmt::format("{} nCount={} conf={:.3f}; ", kv.first, kv.second.nCount, kv.second.conf);
 		}
 		AddTaskLog(console->info("[pmn][send] 窗内聚合 lane={} reqGantry={} delta={} poolSize={} inWindow={} [{}]",
-			plc.workLine, reqGantry, gantryDelta, (int)arrRet.size(), inWindow,
+			plc.workLine, reqGantry, gantryDelta, (int)arrRet.size(), inWindowAll,
 			tally.empty() ? "(empty)" : tally));
 
 		string bestPmn;
 		PmnSet bestSet;
-		if (SelectBestPmn(winSet, bestPmn, bestSet))
+		string selReason;
+		int inWindow = 0;
+		int recentUsed = 0;
+		if (SelectBestPmnRecent(arrRet, reqGantry, gantryDelta, streakK, fallbackM,
+			bestPmn, bestSet, &selReason, &inWindow, &recentUsed))
 		{
 			FillPmnResultFromSet(bestPmn, bestSet, winRet);
 			pPmnRet = &winRet;
 			bIsHavePmnResult = true;
-			AddTaskLog(console->info("[pmn][send] 窗内选中 pmn={} nCount={} conf={} voteGantry={} reqGantry={} delta={}",
-				pPmnRet->pmn, pPmnRet->nCount, pPmnRet->conf, pPmnRet->GantryValue, reqGantry, gantryDelta));
+			AddTaskLog(console->info("[pmn][send] 窗内选中 pmn={} nCount={} conf={} voteGantry={} reqGantry={} delta={} reason={} streakK={} recentM={} recentUsed={}",
+				pPmnRet->pmn, pPmnRet->nCount, pPmnRet->conf, pPmnRet->GantryValue, reqGantry, gantryDelta,
+				selReason, streakK, fallbackM, recentUsed));
 		}
 		else
 		{
