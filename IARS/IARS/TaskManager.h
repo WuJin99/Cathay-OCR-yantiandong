@@ -468,10 +468,38 @@ public:
 	void ClearPmnCache(int lane, const string& reason);
 	/**
 	 * 跟踪各车道入库门控；有车→无车消抖达标后清车顶号与车牌。大车移动不清池。
+	 * 有车时尝试将暂存车牌写入主池。
 	 */
 	void UpdatePmnWindowState();
 
 private:
+	/** 无车时暂存的车牌（未入 m_arrPmnItem2），有车或超时后处理 */
+	struct PendingPlate
+	{
+		bool valid = false;
+		string pmn;
+		float conf = 0.f;
+		string path;
+		int64_t tickMs = 0;
+		int gantry = 0;
+		void Clear()
+		{
+			valid = false;
+			pmn.clear();
+			conf = 0.f;
+			path.clear();
+			tickMs = 0;
+			gantry = 0;
+		}
+	};
+	static int64_t PmnSteadyMs();
+	void SavePendingPlate(int lane, const string& pmn, float conf, const string& path, int gantry);
+	void ClearPendingPlate(int lane);
+	/** 已持有 m_mtxPmnItem：未过期 pending 写入 m_arrPmnItem2，过期则丢弃 */
+	void CommitPendingPlateUnderLock(int lane);
+	/** 加锁后调用 CommitPendingPlateUnderLock */
+	void TryCommitPendingPlate(int lane);
+	void DropExpiredPendingPlate(int lane);
 	/** 窗内同一车顶号的临时汇总（只用于本次拉号选优，不回写样本池） */
 	struct PmnSet
 	{
@@ -510,6 +538,7 @@ private:
 	bool m_pmnWindowInLane[3];   // 逻辑门控状态(带迟滞)，消抖期间可为 true；下标=车道号
 	int m_hasTruckZeroFrames[3]; // 门控内 hasTruck 连续为 0 的帧计数，达 pmnNoTruckClearFrames 才清池
 	int m_gantryAnchor;          // 进入门控时记录的大车编码器，仅诊断日志
+	PendingPlate m_pendingPlate[3]; // 无车早识别暂存，下标=车道号
 
 	};
 #endif //TASKMANAGER_H

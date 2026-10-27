@@ -8,6 +8,7 @@
 #include "EnumTransform.h"
 #include "CGRPCRequest.h"
 #include "PLCHttpComm.h"
+#include <chrono>
 
 std::string GbkToUtf8(std::string& gbk_str) {
 	int wLen = MultiByteToWideChar(CP_ACP, 0, gbk_str.c_str(), -1, NULL, 0);
@@ -122,6 +123,10 @@ TaskManager::TaskManager()
 	memset(m_hasTruckZeroFrames, 0, sizeof(m_hasTruckZeroFrames));
 	memset(cur_truckStatus, 0, sizeof(cur_truckStatus));
 	memset(old_truckStatus, 0, sizeof(old_truckStatus));
+	for (int i = 0; i < 3; ++i)
+	{
+		m_pendingPlate[i].Clear();
+	}
 
     //根据配置参数，创建路径并且检测磁盘容量
 	MakeDirs(g_AppConfig.userCfg.savePath);
@@ -1168,6 +1173,10 @@ bool TaskManager::InitTaskData()
 	memset(m_pmnWindowInLane, 0, sizeof(m_pmnWindowInLane));
 	memset(m_hasTruckZeroFrames, 0, sizeof(m_hasTruckZeroFrames));
 	m_gantryAnchor = -9999;
+	for (int i = 0; i < 3; ++i)
+	{
+		m_pendingPlate[i].Clear();
+	}
 	g_mtxPicItem.lock();
 	vector<tPicItem>::iterator iter;
 	for (iter = g_arrPicItem.begin(); iter != g_arrPicItem.end(); )
@@ -1820,16 +1829,25 @@ void TaskManager::GetPmnResult(string& json_str)
 	m_mtxPmnItem.lock();
 	const int reqGantry = plc.gantryValue; // PIIS 请求瞬间的大车编码器，车顶号/车牌发送窗共用
 	const int gantryDelta = g_AppConfig.userCfg.pmnWindowGantryDelta;
-	// 上传前作业车道必须有车；无车则车顶号/车牌都回空，池内残留不过滤掉但本次不发出
+	// 上传：实时 hasTruck==1，或门控迟滞仍在窗内（离场消抖中 hasTruck 短暂为 0 仍可发）
 	const bool workLaneHasTruck =
 		(plc.workLine >= 1 && plc.workLine <= 2 && plc.hasTruck[plc.workLine] == 1);
+	const bool workLaneInWindow =
+		(plc.workLine >= 1 && plc.workLine <= 2 && m_pmnWindowInLane[plc.workLine]);
+	const bool workLaneCanSend = workLaneHasTruck || workLaneInWindow;
+	// 有车时补提交早到的暂存车牌（已持 m_mtxPmnItem；与 UpdatePmnWindowState 互补）
+	if (workLaneHasTruck)
+	{
+		CommitPendingPlateUnderLock(plc.workLine);
+	}
 	auto iter = m_arrPmnItem.find(plc.workLine);
 
-	// 有车且车道内有样本时才计算
-	if (!workLaneHasTruck)
+	// 可发送且车道内有样本时才计算
+	if (!workLaneCanSend)
 	{
-		AddTaskLog(console->info("[pmn][send] 作业车道无车，PlateTop/TruckPlate 置空 workLine={} hasTruck1={} hasTruck2={}",
-			plc.workLine, plc.hasTruck[1], plc.hasTruck[2]));
+		AddTaskLog(console->info("[pmn][send] 作业车道不可发送，PlateTop/TruckPlate 置空 workLine={} hasTruck1={} hasTruck2={} inWindow1={} inWindow2={}",
+			plc.workLine, plc.hasTruck[1], plc.hasTruck[2],
+			m_pmnWindowInLane[1] ? 1 : 0, m_pmnWindowInLane[2] ? 1 : 0));
 	}
 	else if (iter != m_arrPmnItem.end() && !iter->second.empty())
 	{
@@ -1930,16 +1948,17 @@ void TaskManager::GetPmnResult(string& json_str)
 		cJSON_AddStringToObject(data, "PlateTopPic", "");
 	}
 
-	// -------- 组包 TruckPlate：作业车道有车才上传；再按 reqGantry 窗口过滤，窗外置空但不清缓存 --------
+	// -------- 组包 TruckPlate：可发送才上传；再按 reqGantry 窗口过滤，窗外置空但不清缓存 --------
 	const PmnResult* pPlateCache = nullptr;
 	bool plateInWindow = true;
 	auto plateIter = m_arrPmnItem2.find(plc.workLine);
-	if (!workLaneHasTruck)
+	if (!workLaneCanSend)
 	{
 		if (plateIter != m_arrPmnItem2.end() && !plateIter->second.pmn.empty())
 		{
-			AddTaskLog(console->info("[pmn][send] 作业车道无车，不上传车牌结果 lane={} plate=[{}]",
-				plc.workLine, plateIter->second.pmn));
+			AddTaskLog(console->info("[pmn][send] 作业车道不可发送，不上传车牌结果 lane={} plate=[{}] hasTruck={} inWindow={}",
+				plc.workLine, plateIter->second.pmn,
+				workLaneHasTruck ? 1 : 0, workLaneInWindow ? 1 : 0));
 		}
 	}
 	else if (plateIter != m_arrPmnItem2.end() && !plateIter->second.pmn.empty())
@@ -2455,19 +2474,30 @@ void TaskManager::SetPlateResult(LicPlateResult& plate_result, shared_ptr<cv::Ma
 		AddTaskLog(console->info("[pmn] 相机找不到车道:[{}]", plate_result.sCamIp));
 		return;
 	}
-	// 这里复用车顶号的函数，hastrcuk != 1 时直接丢弃，不写m_arrPmnItem2
-	// 与车顶号相同：该车道无车时不入库，避免过路车车牌在门控已关后写入且无法被清掉
+	// 无车不入主池：可暂存 pending，等 hasTruck 后再写入；其它门控失败仍直接丢弃
 	{
 		string failReason;
 		if (!IsPmnCaptureWindow(plate_result.lane, &failReason))
 		{
 			const int ht = (plate_result.lane >= 1 && plate_result.lane <= 2)
 				? m_plcInfoState.GetCurPLCInfo().hasTruck[plate_result.lane] : -1;
-			AddTaskLog(console->info("[pmn][gate][plate] 门控未过丢弃 plate={} conf={} lane={} reason={} hasTruck={}",
-				plate_result.sLicPlate, plate_result.nBelieve, plate_result.lane, failReason, ht));
+			const int holdMs = g_AppConfig.userCfg.pmnPlateEarlyHoldMs;
+			if (failReason == "noTruck" && holdMs > 0 && plate_result.lane >= 1 && plate_result.lane <= 2)
+			{
+				SavePendingPlate(plate_result.lane, plate_result.sLicPlate,
+					(float)plate_result.nBelieve, plate_result.sFileName, m_plcinfo.gantryValue);
+				AddTaskLog(console->info("[pmn][gate][plate] 无车暂存 plate={} conf={} lane={} holdMs={} hasTruck={}",
+					plate_result.sLicPlate, plate_result.nBelieve, plate_result.lane, holdMs, ht));
+			}
+			else
+			{
+				AddTaskLog(console->info("[pmn][gate][plate] 门控未过丢弃 plate={} conf={} lane={} reason={} hasTruck={}",
+					plate_result.sLicPlate, plate_result.nBelieve, plate_result.lane, failReason, ht));
+			}
 			return;
 		}
 	}
+	ClearPendingPlate(plate_result.lane);
 	// 截取车号后6位进行比较
 	std::string subpmn ="";
 	if (plate_result.sLicPlate.length() > 2)
@@ -2938,6 +2968,12 @@ void TaskManager::ClearPmnCache(int lane, const string& reason)
 		AddTaskLog(console->info("[pmn][gate] 清理车牌结果 {}", it2->second.to_string()));
 		it2->second.Clear();
 	}
+	if (lane >= 1 && lane <= 2 && m_pendingPlate[lane].valid)
+	{
+		AddTaskLog(console->info("[pmn][gate] 清理暂存车牌 lane={} plate={}",
+			lane, m_pendingPlate[lane].pmn));
+		m_pendingPlate[lane].Clear();
+	}
 	m_TaskInfo.mutable_ocr()->clear_pmr_arr();
 	AddTaskLog(console->info("[pmn][gate] ClearPmnCache lane={} reason={} poolSize={}",
 		lane, reason, nSize));
@@ -2947,7 +2983,7 @@ void TaskManager::ClearPmnCache(int lane, const string& reason)
 // 跟踪各车道入库门控状态（TaskTrigger 每帧 PLC 更新后调用）。
 // 门控条件仅 hasTruck；大车移动不影响。无车后经 pmnNoTruckClearFrames 帧消抖才清车顶号池与车牌。
 // m_pmnWindowInLane 为带迟滞的逻辑状态：消抖期间可为 true 而 hasTruck 已为 0；
-// 此时 IsPmnCaptureWindow 仍按实时 hasTruck 拦截新样本入池。
+// 此时 IsPmnCaptureWindow 仍按实时 hasTruck 拦截新样本入主池（车牌可进 pending）。
 void TaskManager::UpdatePmnWindowState()
 {
 	if (!g_AppConfig.userCfg.pmnWindowEnable)
@@ -2982,6 +3018,8 @@ void TaskManager::UpdatePmnWindowState()
 					lane, plc.gantryValue, m_plcInfoState.IsGantryMoving(), plc.hasTruck[lane]));
 			}
 			m_pmnWindowInLane[lane] = true;
+			// 每帧有车都尝试提交暂存车牌（覆盖进车前早识别）
+			TryCommitPendingPlate(lane);
 		}
 		else if (wasIn)
 		{
@@ -3003,10 +3041,106 @@ void TaskManager::UpdatePmnWindowState()
 		}
 		else
 		{
-			// 无车且不在门控内：空闲态
+			// 无车且不在门控内：空闲态；过期暂存丢掉，避免过路牌占坑
+			DropExpiredPendingPlate(lane);
 			m_hasTruckZeroFrames[lane] = 0;
 			m_pmnWindowInLane[lane] = false;
 		}
+	}
+}
+
+int64_t TaskManager::PmnSteadyMs()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+void TaskManager::SavePendingPlate(int lane, const string& pmn, float conf, const string& path, int gantry)
+{
+	if (lane < 1 || lane > 2)
+	{
+		return;
+	}
+	std::lock_guard<std::mutex> lck(m_mtxPmnItem);
+	m_pendingPlate[lane].valid = true;
+	m_pendingPlate[lane].pmn = pmn;
+	m_pendingPlate[lane].conf = conf;
+	m_pendingPlate[lane].path = path;
+	m_pendingPlate[lane].gantry = gantry;
+	m_pendingPlate[lane].tickMs = PmnSteadyMs();
+}
+
+void TaskManager::ClearPendingPlate(int lane)
+{
+	if (lane < 1 || lane > 2)
+	{
+		return;
+	}
+	std::lock_guard<std::mutex> lck(m_mtxPmnItem);
+	m_pendingPlate[lane].Clear();
+}
+
+void TaskManager::CommitPendingPlateUnderLock(int lane)
+{
+	if (lane < 1 || lane > 2)
+	{
+		return;
+	}
+	PendingPlate& pend = m_pendingPlate[lane];
+	if (!pend.valid)
+	{
+		return;
+	}
+	const int holdMs = g_AppConfig.userCfg.pmnPlateEarlyHoldMs;
+	const int64_t age = PmnSteadyMs() - pend.tickMs;
+	if (holdMs <= 0 || age > holdMs)
+	{
+		AddTaskLog(console->info("[pmn][gate][plate] 暂存过期丢弃 plate={} lane={} ageMs={} holdMs={}",
+			pend.pmn, lane, (int)age, holdMs));
+		pend.Clear();
+		return;
+	}
+	m_arrPmnItem2[lane].type = PLCInfo::TRUCK_TYPE_OUTER;
+	m_arrPmnItem2[lane].pmn = pend.pmn;
+	m_arrPmnItem2[lane].conf = pend.conf;
+	m_arrPmnItem2[lane].path = pend.path;
+	m_arrPmnItem2[lane].GantryValue = pend.gantry;
+	m_plateNum = pend.pmn;
+	m_TruckNoPlateNum.plate_num = pend.pmn;
+	if (pend.pmn.length() > 2 && pend.pmn == m_planTruckNum)
+	{
+		m_planTruckMatch = true;
+	}
+	AddTaskLog(console->info("[pmn][gate][plate] 暂存入主池 plate={} conf={} lane={} ageMs={} gantry={}",
+		pend.pmn, pend.conf, lane, (int)age, pend.gantry));
+	pend.Clear();
+}
+
+void TaskManager::TryCommitPendingPlate(int lane)
+{
+	std::lock_guard<std::mutex> lck(m_mtxPmnItem);
+	CommitPendingPlateUnderLock(lane);
+}
+
+void TaskManager::DropExpiredPendingPlate(int lane)
+{
+	if (lane < 1 || lane > 2)
+	{
+		return;
+	}
+	std::lock_guard<std::mutex> lck(m_mtxPmnItem);
+	PendingPlate& pend = m_pendingPlate[lane];
+	if (!pend.valid)
+	{
+		return;
+	}
+	const int holdMs = g_AppConfig.userCfg.pmnPlateEarlyHoldMs;
+	const int64_t age = PmnSteadyMs() - pend.tickMs;
+	if (holdMs <= 0 || age > holdMs)
+	{
+		AddTaskLog(console->info("[pmn][gate][plate] 空闲暂存过期 plate={} lane={} ageMs={} holdMs={}",
+			pend.pmn, lane, (int)age, holdMs));
+		pend.Clear();
 	}
 }
 

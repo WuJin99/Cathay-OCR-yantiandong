@@ -53,6 +53,8 @@ void ParseUserCfgNode(const ptree pNode)
 		g_AppConfig.userCfg.pmnWindowGantryDelta = pNode.get<int>("<xmlattr>.pmnWindowGantryDelta", 1300);
 		// hasTruck 无车消抖帧数，达阈值才 ClearPmnCache（清车顶号+车牌），默认为3
 		g_AppConfig.userCfg.pmnNoTruckClearFrames = pNode.get<int>("<xmlattr>.pmnNoTruckClearFrames", 3);
+		// 车牌早于 PLC hasTruck 到达时暂存，有车后再入主池；默认 2000ms；0=关闭暂存
+		g_AppConfig.userCfg.pmnPlateEarlyHoldMs = pNode.get<int>("<xmlattr>.pmnPlateEarlyHoldMs", 2000);
     }
 }
 // 船公司映射列表配置

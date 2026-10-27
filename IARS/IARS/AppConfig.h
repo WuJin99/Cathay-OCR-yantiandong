@@ -75,6 +75,7 @@ struct UserConfig
 	bool pmnWindowEnable;              // 1=启用入库门控（默认仅 hasTruck）；0=不门控，有效结果都入池
 	int pmnWindowGantryDelta;          // 拉号窗口：|样本gantry - PIIS请求时gantry| 容差，车顶号/车牌发送共用，默认1300≈13m
 	int pmnNoTruckClearFrames;         // hasTruck 1→0 连续无车帧数达此值才清车顶号池与车牌，默认3；0=不去抖(1帧即清)
+	int pmnPlateEarlyHoldMs;           // 车牌在 hasTruck=0 时暂存时长(ms)，有车后再入主池；默认2000；0=不暂存(无车直接丢)
 };
 
 class TaskManager;

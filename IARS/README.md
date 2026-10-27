@@ -2,6 +2,10 @@
 
 面向岸桥/堆场作业的 OCR 采集服务。程序从 PLC 与上层系统接收作业状态、任务和控制消息，按相机配置抓拍图片并请求 CRS 识别服务，复合车号、箱号、ISO、箱门、车牌等结果，随后通过 ZMQ 与 PLC HTTP 接口上报。
 
+## 代码使用说明
+
+- 解压include.7z然后解压postmsg.7z
+
 ## 工程与运行
 
 - 工程入口：`IARS/IRASmain.cpp`；Visual Studio 解决方案：`IARS.sln`。
