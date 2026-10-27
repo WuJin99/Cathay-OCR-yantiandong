@@ -13,8 +13,9 @@
 # 现场问题资料，与工程编译无关
 盐田东港场桥问题汇总/
 
-# IARS：中间产物 / 发布物（源码在 IARS/IARS）
-# obj = IntDir；x64 = OutDir；旧工程旁 x64 保留忽略以免残留
+# IARS：编译产物（源码在 IARS/IARS）
+# build/obj = IntDir；build/out = OutDir；旧路径保留忽略以免残留
+IARS/build/
 IARS/obj/
 IARS/x64/
 IARS/IARS/x64/
