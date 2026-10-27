@@ -69,8 +69,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <!-- 源码 IARS\IARS；中间产物 IARS\obj；发布物 IARS\x64 -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)x64\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\x64\Release</OutDir>
+    <OutDir>$(SolutionDir)x64\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,6 +103,9 @@
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)../lib/debug;$(ProjectDir)../include/protomsg/grpc/lib/debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>grpc.lib;grpc++.lib;grpc++_alts.lib;grpc++_error_details.lib;grpc_unsecure.lib;grpc++_unsecure.lib;libprotocd.lib;libprotobufd.lib;gpr.lib;absl_base.lib;absl_exponential_biased.lib;absl_log_severity.lib;absl_malloc_internal.lib;absl_periodic_sampler.lib;absl_raw_logging_internal.lib;absl_scoped_set_env.lib;absl_spinlock_wait.lib;absl_throw_delegate.lib;absl_hashtablez_sampler.lib;absl_raw_hash_set.lib;absl_flags.lib;absl_flags_config.lib;absl_flags_internal.lib;absl_flags_marshalling.lib;absl_flags_program_name.lib;absl_flags_parse.lib;absl_flags_usage.lib;absl_flags_usage_internal.lib;absl_city.lib;absl_hash.lib;absl_int128.lib;absl_random_distributions.lib;absl_random_internal_distribution_test_util.lib;absl_random_internal_pool_urbg.lib;absl_random_internal_randen.lib;absl_random_internal_randen_hwaes.lib;absl_random_internal_randen_hwaes_impl.lib;absl_random_internal_randen_slow.lib;absl_random_internal_seed_material.lib;absl_random_seed_gen_exception.lib;absl_random_seed_sequences.lib;absl_str_format_internal.lib;absl_strings.lib;absl_strings_internal.lib;absl_graphcycles_internal.lib;absl_synchronization.lib;absl_civil_time.lib;absl_time.lib;absl_time_zone.lib;absl_bad_any_cast_impl.lib;absl_bad_optional_access.lib;absl_bad_variant_access.lib;absl_symbolize.lib;absl_stacktrace.lib;absl_status.lib;absl_statusor.lib;absl_cord.lib;upb.lib;re2.lib;cares_static.lib;zlibstatic.lib;crypto.lib;ssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <!-- 链接期中间产物进 IntDir（v141 无 LinkTimeCodeGenerationObjectFile 映射，用 /LTCGOUT） -->
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalOptions>/LTCGOUT:$(IntDir)$(TargetName).iobj %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,6 +140,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(ProjectDir)../include/protomsg/grpc/lib/release;$(ProjectDir)../lib/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>grpc.lib;grpc++.lib;grpc++_alts.lib;grpc++_error_details.lib;grpc_unsecure.lib;grpc++_unsecure.lib;libprotoc.lib;libprotobuf.lib;gpr.lib;absl_base.lib;absl_exponential_biased.lib;absl_log_severity.lib;absl_malloc_internal.lib;absl_periodic_sampler.lib;absl_raw_logging_internal.lib;absl_scoped_set_env.lib;absl_spinlock_wait.lib;absl_throw_delegate.lib;absl_hashtablez_sampler.lib;absl_raw_hash_set.lib;absl_flags.lib;absl_flags_config.lib;absl_flags_internal.lib;absl_flags_marshalling.lib;absl_flags_program_name.lib;absl_flags_parse.lib;absl_flags_usage.lib;absl_flags_usage_internal.lib;absl_city.lib;absl_hash.lib;absl_int128.lib;absl_random_distributions.lib;absl_random_internal_distribution_test_util.lib;absl_random_internal_pool_urbg.lib;absl_random_internal_randen.lib;absl_random_internal_randen_hwaes.lib;absl_random_internal_randen_hwaes_impl.lib;absl_random_internal_randen_slow.lib;absl_random_internal_seed_material.lib;absl_random_seed_gen_exception.lib;absl_random_seed_sequences.lib;absl_str_format_internal.lib;absl_strings.lib;absl_strings_internal.lib;absl_graphcycles_internal.lib;absl_synchronization.lib;absl_civil_time.lib;absl_time.lib;absl_time_zone.lib;absl_bad_any_cast_impl.lib;absl_bad_optional_access.lib;absl_bad_variant_access.lib;absl_symbolize.lib;absl_stacktrace.lib;absl_status.lib;absl_statusor.lib;absl_cord.lib;upb.lib;re2.lib;cares_static.lib;zlibstatic.lib;crypto.lib;ssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <!-- 链接期中间产物进 IntDir：.lib/.exp=/IMPLIB；.iobj/.ipdb=/LTCGOUT（v141 无属性映射） -->
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalOptions>/LTCGOUT:$(IntDir)$(TargetName).iobj %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
