@@ -10,8 +10,8 @@ CompileFlags:
         - -D_WINSOCK_DEPRECATED_NO_WARNINGS # 关闭 Winsock 旧接口的弃用警告
 
         # project include zed中使用绝对路径
-        - -ID:/workspace/yantiandong/IARS/IARS
-        - -ID:/workspace/yantiandong/IARS/include
-        - -ID:/workspace/yantiandong/IARS/include/protomsg
-        - -ID:/workspace/yantiandong/IARS/include/protomsg/grpc/include
-        - -ID:/workspace/yantiandong/IARS/include/protomsg/grpc/include/address_sorting
+        - -ID:/workspace/OCR-yantiandong/IARS/IARS
+        - -ID:/workspace/OCR-yantiandong/IARS/include
+        - -ID:/workspace/OCR-yantiandong/IARS/include/protomsg
+        - -ID:/workspace/OCR-yantiandong/IARS/include/protomsg/grpc/include
+        - -ID:/workspace/OCR-yantiandong/IARS/include/protomsg/grpc/include/address_sorting
